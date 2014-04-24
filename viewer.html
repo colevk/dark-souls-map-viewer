@@ -4,103 +4,55 @@
   <meta charset="utf-8" />
   <title>Dark Souls Map Viewer</title>
   <link href="css/reset.css" rel="stylesheet" type="text/css">
-</head>
-
-<body>
+  
   <script src="js/lib/three.min.js"></script>
   <script src="js/lib/threejs-extras/controls/OrbitControls.js"></script>
   <script src="js/lib/threejs-extras/BufferGeometryUtils.js"></script>
-
   <script src="js/lib/jspack.js"></script>
+  <script src="js/functions.js"></script>
+  <script src="js/config.js"></script>
+</head>
 
-  <script src="js/LoadData.js"></script>
-
+<body>
   <script>
-  var darkSouls1Filenames = [
-    "data/ds1/Anor Londo.iv",
-    "data/ds1/Ash Lake.iv",
-    "data/ds1/Blighttown + Quelaag's Domain.iv",
-    "data/ds1/Catacombs.iv",
-    "data/ds1/Darkroot Garden + Basin.iv",
-    "data/ds1/Demon Ruins + Lost Izalith.iv",
-    "data/ds1/Depths.iv",
-    "data/ds1/Duke's Archive + Crystal Caves.iv",
-    "data/ds1/Firelink Shrine.iv",
-    // "data/ds1/Kiln of the First Flame.iv",
-    "data/ds1/New Londo Ruins + Valley of Drakes.iv",
-    // "data/ds1/Oolacile.iv",
-    // "data/ds1/Painted World of Ariamis.iv",
-    "data/ds1/Sen's Fortress.iv",
-    "data/ds1/Tomb of the Giants.iv",
-    // "data/ds1/Undead Asylum.iv",
-    "data/ds1/Undead Burg.iv",
-  ];
-
-  var darkSouls2Filenames = [
-    // "data/ds2/Aldia's Keep.iv",
-    // "data/ds2/Brightstone Cove Tseldora + Lord's Private Chamber.iv",
-    // "data/ds2/Dark Chasm of Old.iv",
-    // "data/ds2/Doors of Pharros.iv",
-    // "data/ds2/Dragon Aerie & Dragon Shrine.iv",
-    // "data/ds2/Dragon Memories.iv",
-    // "data/ds2/Drangleic Castle + King's Passage + Throne of Want.iv",
-    // "data/ds2/Forest of Fallen Giants.iv",
-    // "data/ds2/Grave of Saints.iv",
-    // "data/ds2/Harvest Valley + Earthen Peak.iv",
-    // "data/ds2/Heide's Tower of Flame + Cathedral of Blue.iv",
-    // "data/ds2/Heide's Tower of Flame.iv",
-    // "data/ds2/Huntsman's Copse + Undead Purgatory.iv",
-    // "data/ds2/Iron Keep + Belfry Sol.iv",
-    // "data/ds2/Majula (1).iv",
-    // "data/ds2/Majula (2).iv",
-    "data/ds2/Memory of Vammar, Orro, Jeigh.iv",
-    // "data/ds2/No-man's Wharf.iv",
-    // "data/ds2/Shaded Woods + Shrine of Winter.iv",
-    // "data/ds2/Shrine of Amana.iv",
-    // "data/ds2/The Gutter + Black Gulch.iv",
-    // "data/ds2/The Lost Bastille + Sinner's Rise + Belfry Luna.iv",
-    // "data/ds2/Things Betwixt.iv",
-    // "data/ds2/Undead Crypt.iv",
-  ];
-
   var renderer = new THREE.WebGLRenderer();
   renderer.setSize( window.innerWidth, window.innerHeight );
-  document.body.appendChild( renderer.domElement );
+  document.body.appendChild(renderer.domElement);
 
   var scene = new THREE.Scene();
+
   var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
+  camera.position = config.cameraPosition;
+
   var controls = new THREE.OrbitControls(camera);
 
-  var light = new THREE.DirectionalLight(0xffffff);
-  light.position.set(1, 1, 1).normalize();
-  scene.add(light);
+  for (var i = 0; i < config.lights.length; i++) {
+    scene.add(config.lights[i]);
+  }
 
-	var material = new THREE.MeshLambertMaterial({
-    color: 0xffffff,
-    wrapAround: true
-  })
-
-  var filenames = darkSouls1Filenames;
+  filenames = [];
+  for (filename in config.current) {
+    if (config.current.hasOwnProperty(filename) && config.current[filename]) {
+      filenames.push(filename);
+    }
+  }
 
   for (var i = 0; i < filenames.length; i++) {
-    var geometries = loadIVFile(filenames[i]);
+    var geometries = loadIVFile('data/' + filenames[i]);
 
     for (var j = 0; j < geometries.length; j++) {
-  	  var chunk = new THREE.Mesh(geometries[j], material);
+  	  var chunk = new THREE.Mesh(geometries[j], config.material);
   	  scene.add(chunk);
     }
   }
 
-  camera.position.z = 100;
-  camera.position.x = 100;
+  var render = function () {
+    requestAnimationFrame(render);
 
-	var render = function () {
-		requestAnimationFrame(render);
+    renderer.render(scene, camera);
+  };
 
-		renderer.render(scene, camera);
-	};
-
-	render();
+  render();
   </script>
 </body>
 </html>
