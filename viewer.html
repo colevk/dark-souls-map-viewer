@@ -38,12 +38,9 @@
   }
 
   for (var i = 0; i < filenames.length; i++) {
-    var geometries = loadIVFile('data/' + filenames[i]);
-
-    for (var j = 0; j < geometries.length; j++) {
-  	  var chunk = new THREE.Mesh(geometries[j], config.material);
-  	  scene.add(chunk);
-    }
+    loadIVFile('data/' + filenames[i], function (bufferGeometry) {
+      scene.add(new THREE.Mesh(bufferGeometry, config.material));
+    });
   }
 
   var render = function () {
