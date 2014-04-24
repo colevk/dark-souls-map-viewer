@@ -7,40 +7,34 @@
 var jspack = (function () {
   // module-level (private) variables
   var el, bBE = false;
-  
-  // PUBLIC FUNCTIONS
-  
-  // Unpack the octet array a, beginning at offset p, according to the fmt string
-  function unpackFrom(fmt, buffer, offset) {
-    // Set the private bBE flag based on the format string - assume big-endianness
-    bBE = (fmt.charAt(0) != '<');
 
-    offset = offset ? offset : 0;
-    var re = new RegExp(_sPattern, 'g'), m, n, s, rv = [];
-    while (m = re.exec(fmt)) {
-      n = ((m[1]==undefined)||(m[1]==''))?1:parseInt(m[1]);
-      s = _lenLut[m[2]];
-      if ((offset + n * s) > buffer.length) {
-        return undefined;
-      }
-      switch (m[2]) {
-        case 'A': case 's':
-          rv.push(_elLut[m[2]].de(buffer, offset, n));
-          break;
-        case 'c': case 'b': case 'B': case 'h': case 'H':
-        case 'i': case 'I': case 'l': case 'L': case 'f': case 'd':
-          el = _elLut[m[2]];
-          rv.push(_UnpackSeries(n, s, buffer, offset));
-          break;
-      }
-      offset += n * s;
-    }
-    return Array.prototype.concat.apply([], rv);
+  // Class data
+  var _sPattern = '(\\d+)?([AxcbBhHsfdiIlL])';
+  var _lenLut = { 'A':1, 'x':1, 'c':1, 'b':1, 'B':1, 'h':2, 'H':2, 's':1, 'f':4, 'd':8, 'i':4, 'I':4, 'l':4, 'L':4};
+  var _elLut = {  'A': {en:_EnArray, de:_DeArray},
+        's': {en:_EnString, de:_DeString},
+        'c': {en:_EnChar, de:_DeChar},
+        'b': {en:_EnInt, de:_DeInt, len:1, bSigned:true, min:-Math.pow(2, 7), max:Math.pow(2, 7)-1},
+        'B': {en:_EnInt, de:_DeInt, len:1, bSigned:false, min:0, max:Math.pow(2, 8)-1},
+        'h': {en:_EnInt, de:_DeInt, len:2, bSigned:true, min:-Math.pow(2, 15), max:Math.pow(2, 15)-1},
+        'H': {en:_EnInt, de:_DeInt, len:2, bSigned:false, min:0, max:Math.pow(2, 16)-1},
+        'i': {en:_EnInt, de:_DeInt, len:4, bSigned:true, min:-Math.pow(2, 31), max:Math.pow(2, 31)-1},
+        'I': {en:_EnInt, de:_DeInt, len:4, bSigned:false, min:0, max:Math.pow(2, 32)-1},
+        'l': {en:_EnInt, de:_DeInt, len:4, bSigned:true, min:-Math.pow(2, 31), max:Math.pow(2, 31)-1},
+        'L': {en:_EnInt, de:_DeInt, len:4, bSigned:false, min:0, max:Math.pow(2, 32)-1},
+        'f': {en:_En754, de:_De754, len:4, mLen:23, rt:Math.pow(2, -24)-Math.pow(2, -77)},
+        'd': {en:_En754, de:_De754, len:8, mLen:52, rt:0}};
+
+
+  // PUBLIC FUNCTIONS
+
+  // Pack the supplied values into a new octet array, according to the fmt string
+  function pack(fmt, values) {
+    return packInto(fmt, new Array(calcsize(fmt)), 0, values);
   }
 
   // Pack the supplied values into the octet array buffer, beginning at offset, according to the fmt string
-  function packInto(fmt, buffer, offset /*, v1, v2, ... */) {
-    var values = Array.prototype.slice.call(arguments, 3);
+  function packInto(fmt, buffer, offset, values) {
     // Set the private bBE flag based on the format string - assume big-endianness
     bBE = (fmt.charAt(0) != '<');
 
@@ -73,10 +67,37 @@ var jspack = (function () {
     return buffer;
   }
 
-  // Pack the supplied values into a new octet array, according to the fmt string
-  function pack(fmt /* , v1, v2, ... */) {
-    var values = Array.prototype.slice.call(arguments, 1);
-    return jspack.packInto(fmt, new Array(m.CalcLength(fmt)), 0, values);
+  // Unpack the octet array buffer, according to the fmt string
+  function unpack(fmt, buffer) {
+    return unpackFrom(fmt, buffer, 0);
+  }
+
+  // Unpack the octet array buffer, beginning at offset, according to the fmt string
+  function unpackFrom(fmt, buffer, offset) {
+    // Set the private bBE flag based on the format string - assume big-endianness
+    bBE = (fmt.charAt(0) != '<');
+
+    offset = offset ? offset : 0;
+    var re = new RegExp(_sPattern, 'g'), m, n, s, rv = [];
+    while (m = re.exec(fmt)) {
+      n = ((m[1]==undefined)||(m[1]=='')) ? 1 : parseInt(m[1]);
+      s = _lenLut[m[2]];
+      if ((offset + n * s) > buffer.length) {
+        return undefined;
+      }
+      switch (m[2]) {
+        case 'A': case 's':
+          rv.push(_elLut[m[2]].de(buffer, offset, n));
+          break;
+        case 'c': case 'b': case 'B': case 'h': case 'H':
+        case 'i': case 'I': case 'l': case 'L': case 'f': case 'd':
+          el = _elLut[m[2]];
+          rv.push(_UnpackSeries(n, s, buffer, offset));
+          break;
+      }
+      offset += n * s;
+    }
+    return Array.prototype.concat.apply([], rv);
   }
 
   // Determine the number of bytes represented by the format string
@@ -95,7 +116,7 @@ var jspack = (function () {
   function _DeArray(a, p, l) {
     return [a.slice(p,p+l)];
   }
-  
+
   function _EnArray(a, p, l, v) {
     for (var i = 0; i < l; a[p+i] = v[i]?v[i]:0, i++);
   }
@@ -104,7 +125,7 @@ var jspack = (function () {
   function _DeChar(a, p) {
     return String.fromCharCode(a[p]);
   }
-  
+
   function _EnChar(a, p, v) {
     a[p] = v.charCodeAt(0);
   }
@@ -116,7 +137,7 @@ var jspack = (function () {
     if (el.bSigned && (rv & Math.pow(2, el.len*8-1))) { rv -= Math.pow(2, el.len*8); }
     return rv;
   }
-  
+
   function _EnInt(a, p, v) {
     var lsb = bBE?(el.len-1):0, nsb = bBE?-1:1, stop = lsb+nsb*el.len, i;
     v = (v<el.min)?el.min:(v>el.max)?el.max:v;
@@ -128,7 +149,7 @@ var jspack = (function () {
     for (var rv = new Array(l), i = 0; i < l; rv[i] = String.fromCharCode(a[p+i]), i++);
     return rv.join('');
   }
-  
+
   function _EnString(a, p, l, v) {
     for (var t, i = 0; i < l; a[p+i] = (t=v.charCodeAt(i))?t:0, i++);
   }
@@ -158,7 +179,7 @@ var jspack = (function () {
     }
     return (s?-1:1) * m * Math.pow(2, e-mLen);
   }
-  
+
   function _En754(a, p, v) {
     var s, e, m, i, d, c, mLen, eLen, eBias, eMax;
     mLen = el.mLen, eLen = el.len*8-el.mLen-1, eMax = (1<<eLen)-1, eBias = eMax>>1;
@@ -197,24 +218,6 @@ var jspack = (function () {
     a[p+i-d] |= s*128;
   }
 
-
-  // Class data
-  var _sPattern = '(\\d+)?([AxcbBhHsfdiIlL])';
-  var _lenLut = { 'A':1, 'x':1, 'c':1, 'b':1, 'B':1, 'h':2, 'H':2, 's':1, 'f':4, 'd':8, 'i':4, 'I':4, 'l':4, 'L':4};
-  var _elLut = {  'A': {en:_EnArray, de:_DeArray},
-        's': {en:_EnString, de:_DeString},
-        'c': {en:_EnChar, de:_DeChar},
-        'b': {en:_EnInt, de:_DeInt, len:1, bSigned:true, min:-Math.pow(2, 7), max:Math.pow(2, 7)-1},
-        'B': {en:_EnInt, de:_DeInt, len:1, bSigned:false, min:0, max:Math.pow(2, 8)-1},
-        'h': {en:_EnInt, de:_DeInt, len:2, bSigned:true, min:-Math.pow(2, 15), max:Math.pow(2, 15)-1},
-        'H': {en:_EnInt, de:_DeInt, len:2, bSigned:false, min:0, max:Math.pow(2, 16)-1},
-        'i': {en:_EnInt, de:_DeInt, len:4, bSigned:true, min:-Math.pow(2, 31), max:Math.pow(2, 31)-1},
-        'I': {en:_EnInt, de:_DeInt, len:4, bSigned:false, min:0, max:Math.pow(2, 32)-1},
-        'l': {en:_EnInt, de:_DeInt, len:4, bSigned:true, min:-Math.pow(2, 31), max:Math.pow(2, 31)-1},
-        'L': {en:_EnInt, de:_DeInt, len:4, bSigned:false, min:0, max:Math.pow(2, 32)-1},
-        'f': {en:_En754, de:_De754, len:4, mLen:23, rt:Math.pow(2, -24)-Math.pow(2, -77)},
-        'd': {en:_En754, de:_De754, len:8, mLen:52, rt:0}};
-
   // Unpack a series of n elements of size s from array a at offset p with fxn
   function _UnpackSeries(n, s, a, p) {
     for (var fxn = el.de, rv = [], i = 0; i < n; rv.push(fxn(a, p+i*s)), i++);
@@ -226,12 +229,11 @@ var jspack = (function () {
     for (var fxn = el.en, o = 0; o < n; fxn(a, p+o*s, v[i+o]), o++);
   }
 
-  
+
   // Expose only public functions
   return {
     pack: pack,
     packInto: packInto,
-    // unpack: unpack,
     unpackFrom: unpackFrom,
     calcsize: calcsize,
   };
