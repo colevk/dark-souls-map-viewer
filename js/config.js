@@ -48,9 +48,9 @@ config = (function () {
 
   var current = ds1;
 
-  var material = new THREE.MeshLambertMaterial({
+  var material = new THREE.MeshPhongMaterial({
     color: 0xffffff,
-    wrapAround: true
+    wrapAround: true,
   });
 
   var light1 = new THREE.DirectionalLight(0xffffff);
