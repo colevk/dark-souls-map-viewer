@@ -1,7 +1,3 @@
-function init() {
-  
-}
-
 function loadIVFile(filename, onloadFunction) {
   var request = new XMLHttpRequest();
   

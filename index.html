@@ -4,11 +4,12 @@
   <meta charset="utf-8" />
   <title>Dark Souls Map Viewer</title>
   <link href="css/reset.css" rel="stylesheet" type="text/css">
-  
+
+  <script src="js/lib/jquery-2.1.0.min.js"></script>
   <script src="js/lib/three.min.js"></script>
-  <script src="js/lib/threejs-extras/controls/OrbitControls.js"></script>
   <script src="js/lib/threejs-extras/BufferGeometryUtils.js"></script>
-  <script src="js/lib/jspack.js"></script>
+
+  <script src="js/CustomFlyControls.js"></script>
   <script src="js/functions.js"></script>
   <script src="js/config.js"></script>
 </head>
@@ -19,12 +20,17 @@
   renderer.setSize( window.innerWidth, window.innerHeight );
   document.body.appendChild(renderer.domElement);
 
+  var clock = new THREE.Clock();
   var scene = new THREE.Scene();
 
   var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
-  camera.position = config.cameraPosition;
+  camera.eulerOrder = "YXZ";
+  camera.useQuaternion = false;
 
-  var controls = new THREE.OrbitControls(camera);
+  var controls = new THREE.CustomFlyControls(camera);
+	controls.movementSpeed = 20;
+	controls.domElement = renderer.domElement;
+	controls.rollSpeed = 2;
 
   for (var i = 0; i < config.lights.length; i++) {
     scene.add(config.lights[i]);
@@ -46,6 +52,7 @@
   var render = function () {
     requestAnimationFrame(render);
 
+    controls.update(clock.getDelta());
     renderer.render(scene, camera);
   };
 
