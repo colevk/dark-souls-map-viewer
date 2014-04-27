@@ -27,6 +27,7 @@ function loadIVFile(filename, onloadFunction) {
         }
 
         model.computeFaceNormals();
+        model.computeVertexNormals();
         onloadFunction(THREE.BufferGeometryUtils.fromGeometry(model));
       }
     }

@@ -5,7 +5,7 @@
   <title>Dark Souls Map Viewer</title>
   <link href="css/reset.css" rel="stylesheet" type="text/css">
 
-  <script src="js/lib/three.min.js"></script>
+  <script src="js/lib/three.js"></script>
   <script src="js/lib/threejs-extras/BufferGeometryUtils.js"></script>
 
   <script src="js/CustomFlyControls.js"></script>
@@ -46,9 +46,9 @@
     loadIVFile('data/' + filenames[i], function (bufferGeometry) {
       var mesh = new THREE.Mesh(bufferGeometry, config.material);
       scene.add(mesh);
-      var wfh = new THREE.WireframeHelper(mesh, 0xffffff);
-      wfh.material.linewidth = 2;
-      scene.add(wfh);
+      // var wfh = new THREE.WireframeHelper(mesh, 0xffffff);
+      // wfh.material.linewidth = 2;
+      // scene.add(wfh);
     });
   }
 
