@@ -48,7 +48,7 @@ config = (function () {
 
   var current = ds1;
 
-  var material = new THREE.MeshPhongMaterial({
+  var material = new THREE.MeshLambertMaterial({
     color: 0xffffff,
     wrapAround: true,
   });
