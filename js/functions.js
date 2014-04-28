@@ -19,13 +19,26 @@ function loadIVFile(filename, onloadFunction) {
         var verts = new Float32Array(data.buffer.slice(verts_offset, verts_offset + num_verts * 12));
         var tris = new Uint16Array(data.buffer.slice(tris_offset, tris_offset + num_tris * 6));
 
+        var positions = new Float32Array(num_tris * 9);
         var normals = new Float32Array(num_tris * 9);
 
-        // calculate normals
+        // calculate normals and expand vertices
         for (var j = 0; j < num_tris; j++) {
           var v1 = tris[3 * j + 0],
               v2 = tris[3 * j + 1],
               v3 = tris[3 * j + 2];
+
+          positions[9 * j + 0] = verts[3 * v1 + 0];
+          positions[9 * j + 1] = verts[3 * v1 + 1];
+          positions[9 * j + 2] = verts[3 * v1 + 2];
+
+          positions[9 * j + 3] = verts[3 * v2 + 0];
+          positions[9 * j + 4] = verts[3 * v2 + 1];
+          positions[9 * j + 5] = verts[3 * v2 + 2];
+
+          positions[9 * j + 6] = verts[3 * v3 + 0];
+          positions[9 * j + 7] = verts[3 * v3 + 1];
+          positions[9 * j + 8] = verts[3 * v3 + 2];
 
           var v1_x = verts[3 * v2 + 0] - verts[3 * v1 + 0],
               v1_y = verts[3 * v2 + 1] - verts[3 * v1 + 1],
@@ -43,11 +56,7 @@ function loadIVFile(filename, onloadFunction) {
         model.attributes = {
           position: {
             itemSize: 3,
-            array: verts
-          },
-          index: {
-            itemSize: 3,
-            array: tris
+            array: positions
           },
           normal: {
             itemSize: 3,
@@ -56,13 +65,6 @@ function loadIVFile(filename, onloadFunction) {
         };
 
         model.normalizeNormals();
-
-        model.offsets = [{
-          start: 0,
-          count: num_tris * 3,
-          index: 0,
-        }];
-
         onloadFunction(model);
       }
     }
