@@ -23,8 +23,7 @@
   var scene = new THREE.Scene();
 
   var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
-  camera.eulerOrder = "YXZ";
-  camera.useQuaternion = false;
+  camera.rotation.order = "YXZ";
 
   var controls = new THREE.CustomFlyControls(camera);
 	controls.movementSpeed = 20;

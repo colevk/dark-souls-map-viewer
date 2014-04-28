@@ -46,7 +46,7 @@ config = (function () {
     "ds2/Undead Crypt.iv": true,
   };
 
-  var current = ds2;
+  var current = ds1;
 
   var material = new THREE.MeshLambertMaterial({
     color: 0xffffff,
@@ -62,6 +62,5 @@ config = (function () {
     current: current,
     material: material,
     lights: [light1],
-    cameraPosition: cameraPosition,
   };
 })();
