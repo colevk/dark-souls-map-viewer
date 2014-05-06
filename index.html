@@ -5,8 +5,8 @@
   <title>Dark Souls Map Viewer</title>
   <link href="css/reset.css" rel="stylesheet" type="text/css">
 
+  <script src="js/lib/jquery-2.1.1.min.js"></script>
   <script src="js/lib/three.js"></script>
-  <script src="js/lib/threejs-extras/BufferGeometryUtils.js"></script>
 
   <script src="js/CustomFlyControls.js"></script>
   <script src="js/functions.js"></script>
@@ -14,16 +14,22 @@
 </head>
 
 <body>
+  <div id="sidebar" style="height: 100vh; width: 200px; float: right;"></div>
+  <div id="canvas" style="height: 100vh; margin-right: 200px;"></div>
+
   <script>
+  var sidebar = $("#sidebar");
+  var canvas = $("#canvas");
+
   var renderer = new THREE.WebGLRenderer();
-  renderer.setSize( window.innerWidth, window.innerHeight );
-  document.body.appendChild(renderer.domElement);
+  renderer.setSize( canvas.width(), canvas.height() );
+  canvas.append(renderer.domElement);
 
   var clock = new THREE.Clock();
   var scene = new THREE.Scene();
 
-  var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 10000 );
-  camera.rotation.order = "YXZ";
+  var camera = new THREE.PerspectiveCamera( 75, canvas.width() / canvas.height(), 0.1, 10000 );
+  camera.rotation.order = "YZX";
 
   var controls = new THREE.CustomFlyControls(camera);
 	controls.movementSpeed = 20;
@@ -45,9 +51,6 @@
     loadIVFile('data/' + filenames[i], function (bufferGeometry) {
       var mesh = new THREE.Mesh(bufferGeometry, config.material);
       scene.add(mesh);
-      // var wfh = new THREE.WireframeHelper(mesh, 0xffffff);
-      // wfh.material.linewidth = 2;
-      // scene.add(wfh);
     });
   }
 

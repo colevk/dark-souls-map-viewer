@@ -27,7 +27,6 @@ function loadIVFile(filename, onloadFunction) {
               v2 = tris[3 * j + 1],
               v3 = tris[3 * j + 2];
 
-
           var v1_x = verts[3 * v2 + 0] - verts[3 * v1 + 0],
               v1_y = verts[3 * v2 + 1] - verts[3 * v1 + 1],
               v1_z = verts[3 * v2 + 2] - verts[3 * v1 + 2];
