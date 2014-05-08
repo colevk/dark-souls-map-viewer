@@ -31,7 +31,7 @@ function loadIVFile(filename, onloadFunction) {
         };
 
         model.computeVertexNormals();
-        onloadFunction(model);
+        onloadFunction(model, filename);
       }
     }
   };

@@ -13,55 +13,146 @@
   <script src="js/config.js"></script>
 </head>
 
-<body>
-  <div id="sidebar" style="height: 100vh; width: 200px; float: right;"></div>
-  <div id="canvas" style="height: 100vh; margin-right: 200px;"></div>
+<body style="overflow:hidden;">
+  <div id="sidebar" style="height: 100vh; width: 25rem; float: right; overflow: auto">
+    <select>
+      <option value="ds1">Dark Souls 1</option>
+      <option value="ds2">Dark Souls 2</option>
+    </select>
+    <form id="ds1_container" onchange="ds1Change()"></form>
+    <form id="ds2_container" onchange="ds2Change()"></form>
+  </div>
+  <div id="canvas" style="height: 100vh; margin-right: 25rem;"></div>
 
   <script>
-  var sidebar = $("#sidebar");
-  var canvas = $("#canvas");
+  var sidebar, canvas, renderer, clock, scene, camera, controls,
+      ds1Meshes, ds1Enabled, ds2Meshes, ds2Enabled;
 
-  var renderer = new THREE.WebGLRenderer();
-  renderer.setSize( canvas.width(), canvas.height() );
-  canvas.append(renderer.domElement);
+  function setupInterface() {
+    $('#ds2_container').toggle();
 
-  var clock = new THREE.Clock();
-  var scene = new THREE.Scene();
+    for (var i = 0; i < config.ds1.length; i++) {
+      $('#ds1_container').append(
+        $('<label><input type="checkbox" name="ds1" value="' + i + '" checked><span>' + config.ds1[i] + '</span><br></label>')
+      );
+    }
+    for (var i = 0; i < config.ds2.length; i++) {
+      $('#ds2_container').append(
+        $('<label><input type="checkbox" name="ds2" value="' + i + '" checked><span>' + config.ds2[i] + '</span><br></label>')
+      );
+    }
+  }
+  setupInterface();
 
-  var camera = new THREE.PerspectiveCamera( 75, canvas.width() / canvas.height(), 0.1, 10000 );
-  camera.rotation.order = "YZX";
-
-  var controls = new THREE.CustomFlyControls(camera);
-	controls.movementSpeed = 20;
-	controls.domElement = renderer.domElement;
-	controls.rollSpeed = 2;
-
-  for (var i = 0; i < config.lights.length; i++) {
-    scene.add(config.lights[i]);
+  function swapGames() {
+    $('#ds1_container').toggle();
+    $('#ds2_container').toggle();
   }
 
-  filenames = [];
-  for (filename in config.current) {
-    if (config.current.hasOwnProperty(filename) && config.current[filename]) {
-      filenames.push(filename);
+  function init() {
+    sidebar = $('#sidebar');
+    canvas = $('#canvas');
+
+    ds1Enabled = Array.apply(null, new Array(config.ds1.length)).map(Boolean.prototype.valueOf, true);
+    ds2Enabled = Array.apply(null, new Array(config.ds2.length)).map(Boolean.prototype.valueOf, true);
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize( canvas.width(), canvas.height() );
+    canvas.append(renderer.domElement);
+
+    clock = new THREE.Clock();
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera( 75, canvas.width() / canvas.height(), 0.1, 10000 );
+    camera.rotation.order = "YZX";
+
+    controls = new THREE.CustomFlyControls(camera, renderer.domElement);
+    controls.movementSpeed = 20;
+    controls.rollSpeed = 2;
+    controls.dragToLook = true;
+
+    for (var i = 0; i < config.lights.length; i++) {
+      scene.add(config.lights[i]);
+    }
+
+    ds1Meshes = [];
+
+    for (var i = 0; i < config.ds1.length; i++) {
+      var loadFunc = function (bufferGeometry) {
+        var mesh = new THREE.Mesh(bufferGeometry, config.material);
+        if (ds1Meshes[i]) {
+          ds1Meshes[i].push(mesh);
+        } else {
+          ds1Meshes[i] = [mesh];
+        }
+        scene.add(mesh);
+      };
+
+      loadIVFile('data/ds1/' + config.ds1[i] + '.iv', loadFunc);
+    }
+
+
+    ds2Meshes = [];
+    for (var i = 0; i < config.ds2.length; i++) {
+      ds2Meshes[i] = [];
+      var loadFunc = function (bufferGeometry) {
+        var mesh = new THREE.Mesh(bufferGeometry, config.material);
+        if (ds2Meshes[i]) {
+          ds2Meshes[i].push(mesh);
+        } else {
+          ds2Meshes[i] = [mesh];
+        }
+      };
+
+      loadIVFile('data/ds2/' + config.ds2[i] + '.iv', loadFunc);
     }
   }
 
-  for (var i = 0; i < filenames.length; i++) {
-    loadIVFile('data/' + filenames[i], function (bufferGeometry) {
-      var mesh = new THREE.Mesh(bufferGeometry, config.material);
-      scene.add(mesh);
-    });
-  }
-
-  var render = function () {
+  var render = function() {
     requestAnimationFrame(render);
 
     controls.update(clock.getDelta());
     renderer.render(scene, camera);
   };
 
+  init();
   render();
+
+  function ds1Change() {
+    var newValues = Array.apply(null, new Array(ds1Enabled.length)).map(Boolean.prototype.valueOf, false);
+    $('#ds1_container :checked').each(function () {
+      newValues[parseInt($(this).val())] = true;
+    });
+    for (var i = 0; i < newValues.length; i++) {
+      if (newValues[i] && !ds1Enabled[i]) {
+        for (var j = 0; j < ds1Meshes[i].length; j++) {
+          scene.add(ds1Meshes[i][j]);
+        }
+      }
+      if (!newValues[i] && ds1Enabled[i]) {
+        for (var j = 0; j < ds1Meshes[i].length; j++) {
+          scene.remove(ds1Meshes[i][j]);
+        }
+      }
+    }
+    ds1Enabled = newValues;
+  }
+
+  function ds2Change() {
+    var newValues = Array.apply(null, new Array(ds2Enabled.length)).map(Boolean.prototype.valueOf, false);
+    $('#ds2_container :checked').each(function () {
+      newValues[parseInt($(this).val())] = true;
+    });
+    for (var i = 0; i < newValues.length; i++) {
+      if (newValues[i] && !ds2Enabled[i]) {
+        scene.add(ds2Meshes[i]);
+      }
+      if (!newValues[i] && ds2Enabled[i]) {
+        scene.remove(ds2Meshes[i]);
+      }
+    }
+    ds2Enabled = newValues;
+  }
   </script>
 </body>
 </html>
