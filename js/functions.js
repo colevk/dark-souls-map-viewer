@@ -1,5 +1,5 @@
-var barycentric = new Int8Array(589824);
-for (var i = 0; i < 65536; i++) {
+var barycentric = new Float32Array(810000);
+for (var i = 0; i < 90000; i++) {
   barycentric[9 * i] = barycentric[9 * i + 4] = barycentric[9 * i + 8] = 1;
 }
 
@@ -43,6 +43,10 @@ function loadIVFile(filename, onloadFunction) {
           position: {
             itemSize: 3,
             array: positions
+          },
+          color: {
+            itemSize: 3,
+            array: barycentric
           }
         };
 

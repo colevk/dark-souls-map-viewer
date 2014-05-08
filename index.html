@@ -23,6 +23,38 @@
     <form id="ds2_container" onchange="ds2Change()"></form>
   </div>
   <div id="canvas" style="height: 100vh; margin-right: 25rem;"></div>
+  <script id="lambert-vert" type="x-shader/x-vertex">
+  attribute vec3 color;
+
+  varying vec3 vNormal;
+  varying vec3 vBC;
+
+  void main() {
+    vNormal = normal;
+    vBC = color;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+  </script>
+
+  <script id="lambert-frag" type="x-shader/x-fragment">
+  #extension GL_OES_standard_derivatives : enable
+
+  varying vec3 vNormal;
+  varying vec3 vBC;
+
+  float edgeFactor() {
+    vec3 d = fwidth(vBC);
+    vec3 a3 = smoothstep(vec3(0.0), d, vBC);
+    return min(min(a3.x, a3.y), a3.z);
+  }
+
+  void main() {
+    vec3 lambert = vec3(0.75 + 0.25 * dot(vNormal, normalize(vec3(1.0))));
+    vec3 lineColor = vec3(0.0);
+
+    gl_FragColor = vec4(mix(lineColor, lambert, edgeFactor()), 1.0);
+  }
+  </script>
 
   <script>
   var sidebar, canvas, renderer, clock, scene, camera, controls,
@@ -71,40 +103,20 @@
     controls.rollSpeed = 2;
     controls.dragToLook = true;
 
-    for (var i = 0; i < config.lights.length; i++) {
-      scene.add(config.lights[i]);
-    }
+    var material = new THREE.ShaderMaterial({
+      vertexShader: $('#lambert-vert').text(),
+      fragmentShader: $('#lambert-frag').text()
+    });
 
     ds1Meshes = [];
 
     for (var i = 0; i < config.ds1.length; i++) {
       var loadFunc = function (bufferGeometry) {
-        var mesh = new THREE.Mesh(bufferGeometry, config.material);
-        if (ds1Meshes[i]) {
-          ds1Meshes[i].push(mesh);
-        } else {
-          ds1Meshes[i] = [mesh];
-        }
+        var mesh = new THREE.Mesh(bufferGeometry, material);
         scene.add(mesh);
       };
 
       loadIVFile('data/ds1/' + config.ds1[i] + '.iv', loadFunc);
-    }
-
-
-    ds2Meshes = [];
-    for (var i = 0; i < config.ds2.length; i++) {
-      ds2Meshes[i] = [];
-      var loadFunc = function (bufferGeometry) {
-        var mesh = new THREE.Mesh(bufferGeometry, config.material);
-        if (ds2Meshes[i]) {
-          ds2Meshes[i].push(mesh);
-        } else {
-          ds2Meshes[i] = [mesh];
-        }
-      };
-
-      loadIVFile('data/ds2/' + config.ds2[i] + '.iv', loadFunc);
     }
   }
 
@@ -117,42 +129,6 @@
 
   init();
   render();
-
-  function ds1Change() {
-    var newValues = Array.apply(null, new Array(ds1Enabled.length)).map(Boolean.prototype.valueOf, false);
-    $('#ds1_container :checked').each(function () {
-      newValues[parseInt($(this).val())] = true;
-    });
-    for (var i = 0; i < newValues.length; i++) {
-      if (newValues[i] && !ds1Enabled[i]) {
-        for (var j = 0; j < ds1Meshes[i].length; j++) {
-          scene.add(ds1Meshes[i][j]);
-        }
-      }
-      if (!newValues[i] && ds1Enabled[i]) {
-        for (var j = 0; j < ds1Meshes[i].length; j++) {
-          scene.remove(ds1Meshes[i][j]);
-        }
-      }
-    }
-    ds1Enabled = newValues;
-  }
-
-  function ds2Change() {
-    var newValues = Array.apply(null, new Array(ds2Enabled.length)).map(Boolean.prototype.valueOf, false);
-    $('#ds2_container :checked').each(function () {
-      newValues[parseInt($(this).val())] = true;
-    });
-    for (var i = 0; i < newValues.length; i++) {
-      if (newValues[i] && !ds2Enabled[i]) {
-        scene.add(ds2Meshes[i]);
-      }
-      if (!newValues[i] && ds2Enabled[i]) {
-        scene.remove(ds2Meshes[i]);
-      }
-    }
-    ds2Enabled = newValues;
-  }
   </script>
 </body>
 </html>
