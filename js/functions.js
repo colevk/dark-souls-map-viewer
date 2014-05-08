@@ -1,3 +1,9 @@
+var barycentric = new Int8Array(589824);
+for (var i = 0; i < 65536; i++) {
+  barycentric[9 * i] = barycentric[9 * i + 4] = barycentric[9 * i + 8] = 1;
+}
+
+
 function loadIVFile(filename, onloadFunction) {
   var request = new XMLHttpRequest();
 
@@ -19,14 +25,24 @@ function loadIVFile(filename, onloadFunction) {
         var verts = new Float32Array(data.buffer.slice(verts_offset, verts_offset + num_verts * 12));
         var tris = new Uint16Array(data.buffer.slice(tris_offset, tris_offset + num_tris * 6));
 
+        var positions = new Float32Array(num_tris * 9);
+
+        for (var j = 0; j < num_tris; j++) {
+          positions[9 * j + 0] = verts[3 * tris[3 * j + 0] + 0];
+          positions[9 * j + 1] = verts[3 * tris[3 * j + 0] + 1];
+          positions[9 * j + 2] = verts[3 * tris[3 * j + 0] + 2];
+          positions[9 * j + 3] = verts[3 * tris[3 * j + 1] + 0];
+          positions[9 * j + 4] = verts[3 * tris[3 * j + 1] + 1];
+          positions[9 * j + 5] = verts[3 * tris[3 * j + 1] + 2];
+          positions[9 * j + 6] = verts[3 * tris[3 * j + 2] + 0];
+          positions[9 * j + 7] = verts[3 * tris[3 * j + 2] + 1];
+          positions[9 * j + 8] = verts[3 * tris[3 * j + 2] + 2];
+        }
+
         model.attributes = {
           position: {
             itemSize: 3,
-            array: verts
-          },
-          index: {
-            itemSize: 3,
-            array: tris
+            array: positions
           }
         };
 
