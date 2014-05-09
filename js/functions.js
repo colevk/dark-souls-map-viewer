@@ -1,6 +1,6 @@
-var barycentric = new Float32Array(810000);
-for (var i = 0; i < 90000; i++) {
-  barycentric[9 * i] = barycentric[9 * i + 4] = barycentric[9 * i + 8] = 1;
+var vertexNumber = new Float32Array(810000);
+for (var i = 0; i < vertexNumber.length; i++) {
+  vertexNumber[i] = i % 3;
 }
 
 
@@ -44,9 +44,9 @@ function loadIVFile(filename, onloadFunction) {
             itemSize: 3,
             array: positions
           },
-          color: {
-            itemSize: 3,
-            array: barycentric
+          vertexNumber: {
+            itemSize: 1,
+            array: vertexNumber
           }
         };
 

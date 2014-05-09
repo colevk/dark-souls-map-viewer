@@ -15,23 +15,28 @@
 
 <body style="overflow:hidden;">
   <div id="sidebar" style="height: 100vh; width: 25rem; float: right; overflow: auto">
-    <select>
-      <option value="ds1">Dark Souls 1</option>
-      <option value="ds2">Dark Souls 2</option>
-    </select>
-    <form id="ds1_container" onchange="ds1Change()"></form>
-    <form id="ds2_container" onchange="ds2Change()"></form>
+    <form>
+      <label><input type="checkbox" onchange="material.uniforms.normalShading.value = !material.uniforms.normalShading.value">Normal Shading</label><br>
+      <label><input type="checkbox" onchange="material.uniforms.edgeHighlight.value = !material.uniforms.edgeHighlight.value">Edge Highlighting</label><br>
+    </form>
   </div>
   <div id="canvas" style="height: 100vh; margin-right: 25rem;"></div>
   <script id="lambert-vert" type="x-shader/x-vertex">
-  attribute vec3 color;
+  attribute float vertexNumber;
 
   varying vec3 vNormal;
   varying vec3 vBC;
 
   void main() {
     vNormal = normal;
-    vBC = color;
+    vBC = vec3(0.0);
+    if (vertexNumber < 0.5) {
+      vBC.x = 1.0;
+    } else if (vertexNumber < 1.5) {
+      vBC.y = 1.0;
+    } else {
+      vBC.z = 1.0;
+    }
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
   </script>
@@ -39,25 +44,43 @@
   <script id="lambert-frag" type="x-shader/x-fragment">
   #extension GL_OES_standard_derivatives : enable
 
+  uniform vec3 lineColor;
+  uniform vec3 lightDirection;
+  uniform vec3 lightColor;
+  uniform float edgeHighlight;
+  uniform float wrapAround;
+  uniform float normalShading;
+
   varying vec3 vNormal;
   varying vec3 vBC;
 
   float edgeFactor() {
-    vec3 d = fwidth(vBC);
-    vec3 a3 = smoothstep(vec3(0.0), d, vBC);
-    return min(min(a3.x, a3.y), a3.z);
+      vec3 d = fwidth(vBC);
+      vec3 a3 = smoothstep(vec3(0.0), d, vBC);
+      return min(min(a3.x, a3.y), a3.z);
   }
 
   void main() {
-    vec3 lambert = vec3(0.75 + 0.25 * dot(vNormal, normalize(vec3(1.0))));
-    vec3 lineColor = vec3(0.0);
+      vec3 faceColor = lightColor * dot(vNormal, normalize(lightDirection));
 
-    gl_FragColor = vec4(mix(lineColor, lambert, edgeFactor()), 1.0);
+      if (normalShading > 0.0) {
+          faceColor = vNormal;
+      }
+
+      if (wrapAround > 0.0) {
+        faceColor = vec3(0.5) + 0.5 * faceColor;
+      }
+
+      if (edgeHighlight > 0.0) {
+        faceColor = mix(lineColor, faceColor, edgeFactor());
+      }
+
+      gl_FragColor = vec4(faceColor, 1.0);
   }
   </script>
 
   <script>
-  var sidebar, canvas, renderer, clock, scene, camera, controls,
+  var sidebar, canvas, renderer, clock, scene, camera, controls, material,
       ds1Meshes, ds1Enabled, ds2Meshes, ds2Enabled;
 
   function setupInterface() {
@@ -103,9 +126,20 @@
     controls.rollSpeed = 2;
     controls.dragToLook = true;
 
-    var material = new THREE.ShaderMaterial({
+    material = new THREE.ShaderMaterial({
       vertexShader: $('#lambert-vert').text(),
-      fragmentShader: $('#lambert-frag').text()
+      fragmentShader: $('#lambert-frag').text(),
+      attributes: {
+        vertexNumber: { type: 'f' }
+      },
+      uniforms: {
+        lineColor:      { type: 'v3', value: new THREE.Vector3(1, 1, 1) },
+        lightDirection: { type: 'v3', value: new THREE.Vector3(1, 1, 1) },
+        lightColor:     { type: 'v3', value: new THREE.Vector3(1, 1, 1) },
+        normalShading:  { type: 'f',  value: 0 },
+        wrapAround:     { type: 'f',  value: 1 },
+        edgeHighlight:  { type: 'f',  value: 0 },
+      }
     });
 
     ds1Meshes = [];
