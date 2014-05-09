@@ -52,7 +52,7 @@ config = (function () {
   });
 
   var light1 = new THREE.DirectionalLight(0xffffff);
-  light1.position.set(1, 1, 1).normalize();
+  light1.position.set(1, 0, 0).normalize();
 
   return {
     ds1: ds1,

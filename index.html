@@ -15,12 +15,13 @@
 
 <body style="overflow:hidden;">
   <div id="sidebar" style="height: 100vh; width: 25rem; float: right; overflow: auto">
-    <form>
-      <label><input type="checkbox" onchange="material.uniforms.normalShading.value = !material.uniforms.normalShading.value">Normal Shading</label><br>
-      <label><input type="checkbox" onchange="material.uniforms.edgeHighlight.value = !material.uniforms.edgeHighlight.value">Edge Highlighting</label><br>
-    </form>
+    <label><input type="checkbox" onchange="toggleNormalShading()" checked>Normal Shading</label><br>
+    <label><input type="checkbox" onchange="toggleEdgeHighlighting()" checked>Edge Highlighting</label><br>
+    <label><input type="checkbox" onchange="toggleBackFaceCulling()" checked>Cull Backfaces</label><br>
+    <input type="color" onchange="setEdgeColor(this.value)">Edge Color<br>
   </div>
   <div id="canvas" style="height: 100vh; margin-right: 25rem;"></div>
+
   <script id="lambert-vert" type="x-shader/x-vertex">
   attribute float vertexNumber;
 
@@ -44,12 +45,13 @@
   <script id="lambert-frag" type="x-shader/x-fragment">
   #extension GL_OES_standard_derivatives : enable
 
-  uniform vec3 lineColor;
-  uniform vec3 lightDirection;
-  uniform vec3 lightColor;
+  uniform vec3 edgeColor;
   uniform float edgeHighlight;
   uniform float wrapAround;
   uniform float normalShading;
+
+  uniform vec3 directionalLightDirection[MAX_DIR_LIGHTS];
+  uniform vec3 directionalLightColor[MAX_DIR_LIGHTS];
 
   varying vec3 vNormal;
   varying vec3 vBC;
@@ -61,10 +63,17 @@
   }
 
   void main() {
-      vec3 faceColor = lightColor * dot(vNormal, normalize(lightDirection));
+      vec3 normal;
+      if (gl_FrontFacing) {
+        normal = vNormal;
+      } else {
+        normal = -vNormal;
+      }
+
+      vec3 faceColor = vec3(dot(normal, normalize(directionalLightDirection[0])));
 
       if (normalShading > 0.0) {
-          faceColor = vNormal;
+          faceColor = normal;
       }
 
       if (wrapAround > 0.0) {
@@ -72,7 +81,7 @@
       }
 
       if (edgeHighlight > 0.0) {
-        faceColor = mix(lineColor, faceColor, edgeFactor());
+        faceColor = mix(edgeColor, faceColor, edgeFactor());
       }
 
       gl_FragColor = vec4(faceColor, 1.0);
@@ -126,19 +135,22 @@
     controls.rollSpeed = 2;
     controls.dragToLook = true;
 
+    scene.add(config.lights[0]);
+
     material = new THREE.ShaderMaterial({
+      side: THREE.FrontSide,
       vertexShader: $('#lambert-vert').text(),
       fragmentShader: $('#lambert-frag').text(),
       attributes: {
         vertexNumber: { type: 'f' }
       },
       uniforms: {
-        lineColor:      { type: 'v3', value: new THREE.Vector3(1, 1, 1) },
-        lightDirection: { type: 'v3', value: new THREE.Vector3(1, 1, 1) },
-        lightColor:     { type: 'v3', value: new THREE.Vector3(1, 1, 1) },
-        normalShading:  { type: 'f',  value: 0 },
-        wrapAround:     { type: 'f',  value: 1 },
-        edgeHighlight:  { type: 'f',  value: 0 },
+        directionalLightDirection: { type: 'v3v', value: [new THREE.Vector3(1, 1, 1)] },
+        directionalLightColor: { type: 'v3v', value: [new THREE.Vector3(1, 1, 1)] },
+        edgeColor:     { type: 'c', value: new THREE.Color(0x000000) },
+        normalShading: { type: 'f', value: 1 },
+        wrapAround:    { type: 'f', value: 1 },
+        edgeHighlight: { type: 'f', value: 1 },
       }
     });
 
@@ -163,6 +175,26 @@
 
   init();
   render();
+
+  function toggleBackFaceCulling() {
+    if (material.side === THREE.DoubleSide) {
+      material.side = THREE.FrontSide;
+    } else {
+      material.side = THREE.DoubleSide;
+    }
+  }
+
+  function toggleNormalShading() {
+    material.uniforms.normalShading.value = !material.uniforms.normalShading.value;
+  }
+
+  function toggleEdgeHighlighting() {
+    material.uniforms.edgeHighlight.value = !material.uniforms.edgeHighlight.value;
+  }
+
+  function setEdgeColor(color) {
+    material.uniforms.edgeColor.value = new THREE.Color(color);
+  }
   </script>
 </body>
 </html>
