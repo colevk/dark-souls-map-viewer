@@ -8,117 +8,41 @@
   <script src="js/lib/jquery-2.1.1.min.js"></script>
   <script src="js/lib/three.js"></script>
 
-  <script src="js/CustomFlyControls.js"></script>
-  <script src="js/functions.js"></script>
-  <script src="js/config.js"></script>
+  <script src="js/BigShader.js"></script>
+  <script src="js/Controls.js"></script>
+  <script src="js/SceneLoader.js"></script>
+  <script src="js/Config.js"></script>
 </head>
 
 <body style="overflow:hidden;">
   <div id="sidebar" style="height: 100vh; width: 25rem; float: right; overflow: auto">
-    <label><input type="checkbox" onchange="toggleNormalShading()" checked>Normal Shading</label><br>
-    <label><input type="checkbox" onchange="toggleEdgeHighlighting()" checked>Edge Highlighting</label><br>
-    <label><input type="checkbox" onchange="toggleBackFaceCulling()" checked>Cull Backfaces</label><br>
+    <label><input id="normalShading" type="checkbox" onchange="toggleNormalShading()">Normal Shading</label><br>
+    <label><input id="edgeHighlight" type="checkbox" onchange="toggleEdgeHighlighting()">Edge Highlighting</label><br>
+    <label><input id="backfaceCulling" type="checkbox" onchange="toggleBackfaceCulling()">Cull Backfaces</label><br>
     <input type="color" onchange="setEdgeColor(this.value)">Edge Color<br>
   </div>
   <div id="canvas" style="height: 100vh; margin-right: 25rem;"></div>
 
-  <script id="lambert-vert" type="x-shader/x-vertex">
-  attribute float vertexNumber;
-
-  varying vec3 vNormal;
-  varying vec3 vBC;
-
-  void main() {
-    vNormal = normal;
-    vBC = vec3(0.0);
-    if (vertexNumber < 0.5) {
-      vBC.x = 1.0;
-    } else if (vertexNumber < 1.5) {
-      vBC.y = 1.0;
-    } else {
-      vBC.z = 1.0;
-    }
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-  </script>
-
-  <script id="lambert-frag" type="x-shader/x-fragment">
-  #extension GL_OES_standard_derivatives : enable
-
-  uniform vec3 edgeColor;
-  uniform float edgeHighlight;
-  uniform float wrapAround;
-  uniform float normalShading;
-
-  uniform vec3 directionalLightDirection[MAX_DIR_LIGHTS];
-  uniform vec3 directionalLightColor[MAX_DIR_LIGHTS];
-
-  varying vec3 vNormal;
-  varying vec3 vBC;
-
-  float edgeFactor() {
-      vec3 d = fwidth(vBC);
-      vec3 a3 = smoothstep(vec3(0.0), d, vBC);
-      return min(min(a3.x, a3.y), a3.z);
-  }
-
-  void main() {
-      vec3 normal;
-      if (gl_FrontFacing) {
-        normal = vNormal;
-      } else {
-        normal = -vNormal;
-      }
-
-      vec3 faceColor = vec3(dot(normal, normalize(directionalLightDirection[0])));
-
-      if (normalShading > 0.0) {
-          faceColor = normal;
-      }
-
-      if (wrapAround > 0.0) {
-        faceColor = vec3(0.5) + 0.5 * faceColor;
-      }
-
-      if (edgeHighlight > 0.0) {
-        faceColor = mix(edgeColor, faceColor, edgeFactor());
-      }
-
-      gl_FragColor = vec4(faceColor, 1.0);
-  }
-  </script>
-
   <script>
-  var sidebar, canvas, renderer, clock, scene, camera, controls, material,
-      ds1Meshes, ds1Enabled, ds2Meshes, ds2Enabled;
+  var sidebar, canvas, renderer, clock, scene, camera, controls, material;
 
   function setupInterface() {
-    $('#ds2_container').toggle();
-
-    for (var i = 0; i < config.ds1.length; i++) {
-      $('#ds1_container').append(
-        $('<label><input type="checkbox" name="ds1" value="' + i + '" checked><span>' + config.ds1[i] + '</span><br></label>')
-      );
+    if (BigShader.uniforms.normalShading.value) {
+      $('#normalShading').attr('checked', '');
     }
-    for (var i = 0; i < config.ds2.length; i++) {
-      $('#ds2_container').append(
-        $('<label><input type="checkbox" name="ds2" value="' + i + '" checked><span>' + config.ds2[i] + '</span><br></label>')
-      );
-    }
-  }
-  setupInterface();
 
-  function swapGames() {
-    $('#ds1_container').toggle();
-    $('#ds2_container').toggle();
+    if (BigShader.uniforms.edgeHighlight.value) {
+      $('#edgeHighlight').attr('checked', '');
+    }
+
+    if (material.side === THREE.FrontSide) {
+      $('#backfaceCulling').attr('checked', '')
+    }
   }
 
   function init() {
     sidebar = $('#sidebar');
     canvas = $('#canvas');
-
-    ds1Enabled = Array.apply(null, new Array(config.ds1.length)).map(Boolean.prototype.valueOf, true);
-    ds2Enabled = Array.apply(null, new Array(config.ds2.length)).map(Boolean.prototype.valueOf, true);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( canvas.width(), canvas.height() );
@@ -130,39 +54,28 @@
     camera = new THREE.PerspectiveCamera( 75, canvas.width() / canvas.height(), 0.1, 10000 );
     camera.rotation.order = "YZX";
 
-    controls = new THREE.CustomFlyControls(camera, renderer.domElement);
+    controls = new Controls(camera, renderer.domElement);
     controls.movementSpeed = 20;
     controls.rollSpeed = 2;
     controls.dragToLook = true;
 
-    scene.add(config.lights[0]);
+    scene.add(Config.light);
 
     material = new THREE.ShaderMaterial({
       side: THREE.FrontSide,
-      vertexShader: $('#lambert-vert').text(),
-      fragmentShader: $('#lambert-frag').text(),
-      attributes: {
-        vertexNumber: { type: 'f' }
-      },
-      uniforms: {
-        directionalLightDirection: { type: 'v3v', value: [new THREE.Vector3(1, 1, 1)] },
-        directionalLightColor: { type: 'v3v', value: [new THREE.Vector3(1, 1, 1)] },
-        edgeColor:     { type: 'c', value: new THREE.Color(0x000000) },
-        normalShading: { type: 'f', value: 1 },
-        wrapAround:    { type: 'f', value: 1 },
-        edgeHighlight: { type: 'f', value: 1 },
-      }
+      attributes:     BigShader.attributes,
+      uniforms:       BigShader.uniforms,
+      vertexShader:   BigShader.vertexShader,
+      fragmentShader: BigShader.fragmentShader
     });
 
-    ds1Meshes = [];
-
-    for (var i = 0; i < config.ds1.length; i++) {
+    for (var i = 0; i < Config.ds1.length; i++) {
       var loadFunc = function (bufferGeometry) {
         var mesh = new THREE.Mesh(bufferGeometry, material);
         scene.add(mesh);
       };
 
-      loadIVFile('data/ds1/' + config.ds1[i] + '.iv', loadFunc);
+      SceneLoader.loadIVFile('data/ds1/' + Config.ds1[i] + '.iv', loadFunc);
     }
   }
 
@@ -174,9 +87,10 @@
   };
 
   init();
+  setupInterface();
   render();
 
-  function toggleBackFaceCulling() {
+  function toggleBackfaceCulling() {
     if (material.side === THREE.DoubleSide) {
       material.side = THREE.FrontSide;
     } else {

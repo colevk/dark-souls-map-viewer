@@ -1,5 +1,5 @@
-config = (function () {
-  var ds1 = [
+Config = new function () {
+  this.ds1 = [
     "Anor Londo",
     "Ash Lake",
     "Blighttown + Quelaag's Domain",
@@ -19,7 +19,7 @@ config = (function () {
     "Undead Burg",
   ];
 
-  var ds2 = [
+  this.ds2 = [
     "Aldia's Keep",
     "Brightstone Cove Tseldora + Lord's Private Chamber",
     "Dark Chasm of Old",
@@ -46,18 +46,6 @@ config = (function () {
     "Undead Crypt",
   ];
 
-  var material = new THREE.MeshLambertMaterial({
-    color: 0xffffff,
-    wrapAround: true,
-  });
-
-  var light1 = new THREE.DirectionalLight(0xffffff);
-  light1.position.set(1, 0, 0).normalize();
-
-  return {
-    ds1: ds1,
-    ds2: ds2,
-    material: material,
-    lights: [light1],
-  };
-})();
+  this.light = new THREE.DirectionalLight(0xffffff);
+  this.light.position.set(1, 0, 0).normalize();
+};

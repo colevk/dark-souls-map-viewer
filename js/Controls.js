@@ -2,7 +2,7 @@
  * @author James Baicoianu / http://www.baicoianu.com/
  */
 
-THREE.CustomFlyControls = function ( object, domElement ) {
+Controls = function ( object, domElement ) {
 
   this.object = object;
 
