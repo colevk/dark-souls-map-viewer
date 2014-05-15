@@ -9,6 +9,7 @@
   <script src="js/lib/three.js"></script>
 
   <script src="js/BigShader.js"></script>
+  <script src="js/Interface.js"></script>
   <script src="js/Controls.js"></script>
   <script src="js/SceneLoader.js"></script>
   <script src="js/Config.js"></script>
@@ -16,29 +17,16 @@
 
 <body style="overflow:hidden;">
   <div id="sidebar" style="height: 100vh; width: 25rem; float: right; overflow: auto">
-    <label><input id="normalShading" type="checkbox" onchange="toggleNormalShading()">Normal Shading</label><br>
-    <label><input id="edgeHighlight" type="checkbox" onchange="toggleEdgeHighlighting()">Edge Highlighting</label><br>
-    <label><input id="backfaceCulling" type="checkbox" onchange="toggleBackfaceCulling()">Cull Backfaces</label><br>
-    <input type="color" onchange="setEdgeColor(this.value)">Edge Color<br>
+    <label><input id="normalShading" type="checkbox" onchange="Interface.toggleNormalShading()">Normal Shading</label><br>
+    <label><input id="edgeHighlight" type="checkbox" onchange="Interface.toggleEdgeHighlighting()">Edge Highlighting</label><br>
+    <label><input id="backfaceCulling" type="checkbox" onchange="Interface.toggleBackfaceCulling()">Cull Backfaces</label><br>
+    <label><input id="wrapAround" type="checkbox" onchange="Interface.toggleWrapAround()">Wrap Around Lighting</label><br>
+    <input type="color" onchange="Interface.setEdgeColor(this.value)">Edge Color<br>
   </div>
   <div id="canvas" style="height: 100vh; margin-right: 25rem;"></div>
 
   <script>
   var sidebar, canvas, renderer, clock, scene, camera, controls, material;
-
-  function setupInterface() {
-    if (BigShader.uniforms.normalShading.value) {
-      $('#normalShading').attr('checked', '');
-    }
-
-    if (BigShader.uniforms.edgeHighlight.value) {
-      $('#edgeHighlight').attr('checked', '');
-    }
-
-    if (material.side === THREE.FrontSide) {
-      $('#backfaceCulling').attr('checked', '')
-    }
-  }
 
   function init() {
     sidebar = $('#sidebar');
@@ -50,33 +38,23 @@
 
     clock = new THREE.Clock();
     scene = new THREE.Scene();
+    material = BigShaderMaterial;
 
     camera = new THREE.PerspectiveCamera( 75, canvas.width() / canvas.height(), 0.1, 10000 );
-    camera.rotation.order = "YZX";
 
     controls = new Controls(camera, renderer.domElement);
-    controls.movementSpeed = 20;
-    controls.rollSpeed = 2;
-    controls.dragToLook = true;
-
-    scene.add(Config.light);
-
-    material = new THREE.ShaderMaterial({
-      side: THREE.FrontSide,
-      attributes:     BigShader.attributes,
-      uniforms:       BigShader.uniforms,
-      vertexShader:   BigShader.vertexShader,
-      fragmentShader: BigShader.fragmentShader
-    });
 
     for (var i = 0; i < Config.ds1.length; i++) {
       var loadFunc = function (bufferGeometry) {
-        var mesh = new THREE.Mesh(bufferGeometry, material);
+        var mesh = new THREE.Mesh(bufferGeometry, BigShaderMaterial);
         scene.add(mesh);
       };
 
       SceneLoader.loadIVFile('data/ds1/' + Config.ds1[i] + '.iv', loadFunc);
     }
+
+    scene.add(Config.light);
+
   }
 
   var render = function() {
@@ -87,28 +65,8 @@
   };
 
   init();
-  setupInterface();
+  Interface.setupInterface();
   render();
-
-  function toggleBackfaceCulling() {
-    if (material.side === THREE.DoubleSide) {
-      material.side = THREE.FrontSide;
-    } else {
-      material.side = THREE.DoubleSide;
-    }
-  }
-
-  function toggleNormalShading() {
-    material.uniforms.normalShading.value = !material.uniforms.normalShading.value;
-  }
-
-  function toggleEdgeHighlighting() {
-    material.uniforms.edgeHighlight.value = !material.uniforms.edgeHighlight.value;
-  }
-
-  function setEdgeColor(color) {
-    material.uniforms.edgeColor.value = new THREE.Color(color);
-  }
   </script>
 </body>
 </html>

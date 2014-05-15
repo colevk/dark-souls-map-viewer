@@ -5,17 +5,18 @@
 Controls = function ( object, domElement ) {
 
   this.object = object;
+  this.object.rotation.order = "YZX";
 
   this.domElement = ( domElement !== undefined ) ? domElement : document;
   if ( domElement ) this.domElement.setAttribute( 'tabindex', -1 );
 
   // API
 
-  this.movementSpeed = 1.0;
+  this.movementSpeed = 10;
   this.movementSpeedMultiplier = 1;
-  this.rollSpeed = 0.005;
+  this.rollSpeed = 2;
 
-  this.dragToLook = false;
+  this.dragToLook = true;
   this.autoForward = false;
 
   // disable default target object behavior

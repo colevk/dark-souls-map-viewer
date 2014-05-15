@@ -47,5 +47,5 @@ Config = new function () {
   ];
 
   this.light = new THREE.DirectionalLight(0xffffff);
-  this.light.position.set(1, 0, 0).normalize();
+  this.light.position.set(1, 1, 1).normalize();
 };

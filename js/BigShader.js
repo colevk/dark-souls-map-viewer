@@ -9,9 +9,9 @@ BigShader = {
   uniforms: {
 
     "edgeColor":     { type: "v3", value: new THREE.Vector3(0, 0, 0) },
-    "edgeHighlight": { type: "f", value: true },
-    "wrapAround":    { type: "f", value: true },
-    "normalShading": { type: "f", value: true }
+    "edgeHighlight": { type: "f", value: 1.0 },
+    "wrapAround":    { type: "f", value: 1.0 },
+    "normalShading": { type: "f", value: 1.0 }
 
   },
 
@@ -95,3 +95,16 @@ BigShader = {
   ].join("\n")
 
 };
+
+
+BigShaderMaterial = new THREE.ShaderMaterial({
+  side: THREE.DoubleSide,
+  lights: true,
+  attributes: BigShader.attributes,
+  uniforms: THREE.UniformsUtils.merge([
+    THREE.UniformsLib.lights,
+    BigShader.uniforms,
+  ]),
+  vertexShader: BigShader.vertexShader,
+  fragmentShader: BigShader.fragmentShader
+});
