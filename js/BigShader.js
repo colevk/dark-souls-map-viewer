@@ -50,8 +50,12 @@ BigShader = {
     "uniform float wrapAround;",
     "uniform float normalShading;",
 
-    "uniform vec3 directionalLightDirection[MAX_DIR_LIGHTS];",
-    "uniform vec3 directionalLightColor[MAX_DIR_LIGHTS];",
+    "uniform vec3 ambientLightColor;",
+
+    "#if (MAX_DIR_LIGHTS > 0)",
+      "uniform vec3 directionalLightDirection[MAX_DIR_LIGHTS];",
+      "uniform vec3 directionalLightColor[MAX_DIR_LIGHTS];",
+    "#endif",
 
     "varying vec3 vNormal;",
     "varying vec3 vBC;",
@@ -74,14 +78,28 @@ BigShader = {
           "normal = -vNormal;",
         "}",
 
-        "vec3 faceColor = vec3(dot(normal, normalize(directionalLightDirection[0])));",
+        "vec3 faceColor = ambientLightColor;",
+
+        "#if (MAX_DIR_LIGHTS > 0)",
+          "for (int i = 0; i < MAX_DIR_LIGHTS; i++) {",
+            "float intensity = dot(normalize(normal),",
+                                  "normalize(directionalLightDirection[i]));",
+
+            "if (wrapAround > 0.0) {",
+              "intensity = 0.5 + 0.5 * intensity;",
+            "}",
+            "intensity = clamp(intensity, 0.0, 1.0);",
+
+            "faceColor += directionalLightColor[i] * intensity;",
+          "}",
+        "#endif",
 
         "if (normalShading > 0.0) {",
+          "if (wrapAround > 0.0) {",
+            "faceColor = vec3(0.5) + 0.5 * normal;",
+          "} else {",
             "faceColor = normal;",
-        "}",
-
-        "if (wrapAround > 0.0) {",
-          "faceColor = vec3(0.5) + 0.5 * faceColor;",
+          "}",
         "}",
 
         "if (edgeHighlight > 0.0) {",

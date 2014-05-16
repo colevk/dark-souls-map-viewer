@@ -41,4 +41,15 @@ Interface = new function () {
     var tmpColor = new THREE.Color(color);
     material.uniforms.edgeColor.value = new THREE.Vector3(tmpColor.r, tmpColor.g, tmpColor.b);
   }
+
+  this.swapGames = function () {
+    for (var i = 0; i < meshes.length; i++) {
+      if (meshes[i].game === currentGame) {
+        scene.remove(meshes[i]);
+      } else {
+        scene.add(meshes[i]);
+      }
+    }
+    currentGame = (currentGame === 'ds1') ? 'ds2' : 'ds1';
+  }
 }

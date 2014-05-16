@@ -46,6 +46,8 @@ Config = new function () {
     "Undead Crypt",
   ];
 
-  this.light = new THREE.DirectionalLight(0xffffff);
-  this.light.position.set(1, 1, 1).normalize();
+  var light1 = new THREE.DirectionalLight(0xffffff);
+  light1.position.set(1, 2, 3);
+
+  this.lights = [ light1 ];
 };

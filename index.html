@@ -22,11 +22,13 @@
     <label><input id="backfaceCulling" type="checkbox" onchange="Interface.toggleBackfaceCulling()">Cull Backfaces</label><br>
     <label><input id="wrapAround" type="checkbox" onchange="Interface.toggleWrapAround()">Wrap Around Lighting</label><br>
     <input type="color" onchange="Interface.setEdgeColor(this.value)">Edge Color<br>
+    <button onclick="Interface.swapGames()">Swap games</button><br>
   </div>
   <div id="canvas" style="height: 100vh; margin-right: 25rem;"></div>
 
   <script>
   var sidebar, canvas, renderer, clock, scene, camera, controls, material;
+  var meshes, currentGame;
 
   function init() {
     sidebar = $('#sidebar');
@@ -44,17 +46,35 @@
 
     controls = new Controls(camera, renderer.domElement);
 
+    meshes = [];
+    currentGame = 'ds1';
+
     for (var i = 0; i < Config.ds1.length; i++) {
       var loadFunc = function (bufferGeometry) {
         var mesh = new THREE.Mesh(bufferGeometry, BigShaderMaterial);
+        mesh.game = 'ds1';
+        mesh.fileNumber = i;
+        meshes.push(mesh);
         scene.add(mesh);
       };
 
       SceneLoader.loadIVFile('data/ds1/' + Config.ds1[i] + '.iv', loadFunc);
     }
 
-    scene.add(Config.light);
+    for (var i = 0; i < Config.ds2.length; i++) {
+      var loadFunc = function (bufferGeometry) {
+        var mesh = new THREE.Mesh(bufferGeometry, BigShaderMaterial);
+        mesh.game = 'ds2';
+        mesh.fileNumber = i;
+        meshes.push(mesh);
+      };
 
+      SceneLoader.loadIVFile('data/ds2/' + Config.ds2[i] + '.iv', loadFunc);
+    }
+
+    for (var i = 0; i < Config.lights.length; i++) {
+      scene.add(Config.lights[i]);
+    }
   }
 
   var render = function() {
