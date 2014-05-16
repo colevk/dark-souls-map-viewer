@@ -2,21 +2,25 @@ Interface = new function () {
   this.setupInterface = function () {
     $('#ds2').toggle();
 
-    ds1State = [];
-    ds2State = [];
+    ds1State = Config.ds1State;
+    ds2State = Config.ds2State;
 
     for (var i = 0; i < Config.ds1.length; i++) {
-      ds1State[i] = true;
-      $('#ds1').append(
-        $('<label><input type="checkbox" name="ds1" value="' + i + '" checked><span>' + Config.ds1[i] + '</span><br></label>')
-      );
+      var checked = ds1State[i] ? ' checked' : '';
+      var elem = $('<label><input type="checkbox" name="ds1" value="' +
+                  i + '"' + checked +'><span>' + Config.ds1[i] +
+                  '</span><br></label>')
+
+      $('#ds1').append(elem);
     }
 
     for (var i = 0; i < Config.ds2.length; i++) {
-      ds2State[i] = true;
-      $('#ds2').append(
-        $('<label><input type="checkbox" name="ds2" value="' + i + '" checked><span>' + Config.ds2[i] + '</span><br></label>')
-      );
+      var checked = ds2State[i] ? ' checked' : '';
+      var elem = $('<label><input type="checkbox" name="ds2" value="' +
+                  i + '"' + checked +'><span>' + Config.ds2[i] +
+                  '</span><br></label>')
+
+      $('#ds2').append(elem);
     }
 
     if (material.uniforms.normalShading.value) {
@@ -63,6 +67,11 @@ Interface = new function () {
 
   this.setLightColor = function (color) {
     Config.light.color = new THREE.Color(color);
+  }
+
+  this.resetCamera = function () {
+    camera.position = Config.defaultCameraPosition();
+    camera.lookAt(Config.defaultCameraLookAt());
   }
 
   this.swapGames = function () {

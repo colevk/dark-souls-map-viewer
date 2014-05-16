@@ -19,6 +19,26 @@ Config = new function () {
     "Undead Burg",
   ];
 
+  this.ds1State = [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    false,
+    false,
+    true,
+    true,
+    false,
+    true,
+  ];
+
   this.ds2 = [
     "Aldia's Keep",
     "Brightstone Cove Tseldora + Lord's Private Chamber",
@@ -46,6 +66,41 @@ Config = new function () {
     "Undead Crypt",
   ];
 
+  this.ds2State = [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    false,
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    false,
+    true,
+    true,
+    false,
+    true,
+    false,
+    false,
+    false,
+  ]
+
   this.light = new THREE.DirectionalLight(0xffffff);
   this.light.position.set(1, 2, 3);
+
+  this.defaultCameraPosition = function () {
+    return new THREE.Vector3(-20, 40, 0);
+  }
+
+  this.defaultCameraLookAt = function () {
+    return new THREE.Vector3(-100, 0, 40);
+  }
 };

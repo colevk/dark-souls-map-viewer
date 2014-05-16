@@ -23,6 +23,7 @@
     <label><input id="wrapAround" type="checkbox" onchange="Interface.toggleWrapAround()">Wrap-around Lighting</label><br>
     <input type="color" value="#000000" onchange="Interface.setEdgeColor(this.value)">Edge Color<br>
     <input type="color" value="#ffffff" onchange="Interface.setLightColor(this.value)">Light Color<br>
+    <button onclick="Interface.resetCamera()">Reset camera position</button><br>
     <button onclick="Interface.swapGames()">Swap games</button><br>
     <form id="ds1" onchange="Interface.addRemove()"></form>
     <form id="ds2" onchange="Interface.addRemove()"></form>
@@ -49,8 +50,8 @@
 
     controls = new Controls(camera, renderer.domElement);
 
-    camera.position = new THREE.Vector3(-20, 40, 0);
-    camera.lookAt(new THREE.Vector3(-100, 0, 40));
+    camera.position = Config.defaultCameraPosition();
+    camera.lookAt(Config.defaultCameraLookAt());
 
     meshes = [];
     currentGame = 'ds1';
@@ -61,7 +62,8 @@
         mesh.game = 'ds1';
         mesh.fileNumber = fileNumber;
         meshes.push(mesh);
-        scene.add(mesh);
+
+        if (Config.ds1State[fileNumber]) { scene.add(mesh); }
       };
 
       SceneLoader.loadIVFile('data/ds1/' + Config.ds1[i] + '.iv', i, loadFunc);
