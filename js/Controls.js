@@ -1,5 +1,6 @@
 /**
  * @author James Baicoianu / http://www.baicoianu.com/
+ * modified by Cole van Krieken
  */
 
 Controls = function ( object, domElement ) {

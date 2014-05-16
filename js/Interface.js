@@ -1,5 +1,24 @@
 Interface = new function () {
   this.setupInterface = function () {
+    $('#ds2').toggle();
+
+    ds1State = [];
+    ds2State = [];
+
+    for (var i = 0; i < Config.ds1.length; i++) {
+      ds1State[i] = true;
+      $('#ds1').append(
+        $('<label><input type="checkbox" name="ds1" value="' + i + '" checked><span>' + Config.ds1[i] + '</span><br></label>')
+      );
+    }
+
+    for (var i = 0; i < Config.ds2.length; i++) {
+      ds2State[i] = true;
+      $('#ds2').append(
+        $('<label><input type="checkbox" name="ds2" value="' + i + '" checked><span>' + Config.ds2[i] + '</span><br></label>')
+      );
+    }
+
     if (material.uniforms.normalShading.value) {
       $('#normalShading').attr('checked', '');
     }
@@ -42,14 +61,55 @@ Interface = new function () {
     material.uniforms.edgeColor.value = new THREE.Vector3(tmpColor.r, tmpColor.g, tmpColor.b);
   }
 
+  this.setLightColor = function (color) {
+    Config.light.color = new THREE.Color(color);
+  }
+
   this.swapGames = function () {
+    $('#ds1').toggle();
+    $('#ds2').toggle();
+
+    currentGame = (currentGame === 'ds1') ? 'ds2' : 'ds1';
+    var newState = (currentGame === 'ds1') ? ds1State : ds2State
+
     for (var i = 0; i < meshes.length; i++) {
-      if (meshes[i].game === currentGame) {
-        scene.remove(meshes[i]);
-      } else {
-        scene.add(meshes[i]);
+      var mesh = meshes[i];
+      if (mesh.game !== currentGame) {
+        scene.remove(mesh);
+      } else if (newState[mesh.fileNumber]) {
+        scene.add(mesh);
       }
     }
-    currentGame = (currentGame === 'ds1') ? 'ds2' : 'ds1';
+  }
+
+  this.addRemove = function () {
+    var newState = [];
+    var oldState = (currentGame === 'ds1') ? ds1State : ds2State;
+    $('input[name=' + currentGame +']:checked').each(function () {
+      newState[parseInt(this.value)] = true;
+    });
+    var toAdd = [];
+    var toRemove = [];
+    for (var i = 0; i < oldState.length; i++) {
+      if (newState[i] === undefined) { newState[i] = false; }
+      if (newState[i] && ! oldState[i]) {
+        toAdd.push(i);
+        oldState[i] = true;
+      } else if (! newState[i] && oldState[i]) {
+        toRemove.push(i);
+        oldState[i] = false;
+      }
+    }
+
+    for (var i = 0; i < meshes.length; i++) {
+      var mesh = meshes[i];
+      if (mesh.game === currentGame) {
+        if (toAdd.indexOf(mesh.fileNumber) >= 0) {
+          scene.add(mesh);
+        } else if (toRemove.indexOf(mesh.fileNumber) >= 0) {
+          scene.remove(mesh);
+        }
+      }
+    }
   }
 }

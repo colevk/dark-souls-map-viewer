@@ -4,7 +4,7 @@ SceneLoader = new function () {
     vertexNumber[i] = i % 3;
   }
 
-  this.loadIVFile = function (filename, onloadFunction) {
+  this.loadIVFile = function (filename, fileNumber, onloadFunction) {
     var request = new XMLHttpRequest();
 
     request.onreadystatechange = function() {
@@ -51,7 +51,7 @@ SceneLoader = new function () {
           };
 
           model.computeVertexNormals();
-          onloadFunction(model, filename);
+          onloadFunction(model, fileNumber);
         }
       }
     };

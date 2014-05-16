@@ -20,15 +20,18 @@
     <label><input id="normalShading" type="checkbox" onchange="Interface.toggleNormalShading()">Normal Shading</label><br>
     <label><input id="edgeHighlight" type="checkbox" onchange="Interface.toggleEdgeHighlighting()">Edge Highlighting</label><br>
     <label><input id="backfaceCulling" type="checkbox" onchange="Interface.toggleBackfaceCulling()">Cull Backfaces</label><br>
-    <label><input id="wrapAround" type="checkbox" onchange="Interface.toggleWrapAround()">Wrap Around Lighting</label><br>
-    <input type="color" onchange="Interface.setEdgeColor(this.value)">Edge Color<br>
+    <label><input id="wrapAround" type="checkbox" onchange="Interface.toggleWrapAround()">Wrap-around Lighting</label><br>
+    <input type="color" value="#000000" onchange="Interface.setEdgeColor(this.value)">Edge Color<br>
+    <input type="color" value="#ffffff" onchange="Interface.setLightColor(this.value)">Light Color<br>
     <button onclick="Interface.swapGames()">Swap games</button><br>
+    <form id="ds1" onchange="Interface.addRemove()"></form>
+    <form id="ds2" onchange="Interface.addRemove()"></form>
   </div>
   <div id="canvas" style="height: 100vh; margin-right: 25rem;"></div>
 
   <script>
   var sidebar, canvas, renderer, clock, scene, camera, controls, material;
-  var meshes, currentGame;
+  var meshes, currentGame, ds1State, ds2State;
 
   function init() {
     sidebar = $('#sidebar');
@@ -46,35 +49,36 @@
 
     controls = new Controls(camera, renderer.domElement);
 
+    camera.position = new THREE.Vector3(-20, 40, 0);
+    camera.lookAt(new THREE.Vector3(-100, 0, 40));
+
     meshes = [];
     currentGame = 'ds1';
 
     for (var i = 0; i < Config.ds1.length; i++) {
-      var loadFunc = function (bufferGeometry) {
+      function loadFunc(bufferGeometry, fileNumber) {
         var mesh = new THREE.Mesh(bufferGeometry, BigShaderMaterial);
         mesh.game = 'ds1';
-        mesh.fileNumber = i;
+        mesh.fileNumber = fileNumber;
         meshes.push(mesh);
         scene.add(mesh);
       };
 
-      SceneLoader.loadIVFile('data/ds1/' + Config.ds1[i] + '.iv', loadFunc);
+      SceneLoader.loadIVFile('data/ds1/' + Config.ds1[i] + '.iv', i, loadFunc);
     }
 
     for (var i = 0; i < Config.ds2.length; i++) {
-      var loadFunc = function (bufferGeometry) {
+      var loadFunc = function (bufferGeometry, fileNumber) {
         var mesh = new THREE.Mesh(bufferGeometry, BigShaderMaterial);
         mesh.game = 'ds2';
-        mesh.fileNumber = i;
+        mesh.fileNumber = fileNumber;
         meshes.push(mesh);
       };
 
-      SceneLoader.loadIVFile('data/ds2/' + Config.ds2[i] + '.iv', loadFunc);
+      SceneLoader.loadIVFile('data/ds2/' + Config.ds2[i] + '.iv', i, loadFunc);
     }
 
-    for (var i = 0; i < Config.lights.length; i++) {
-      scene.add(Config.lights[i]);
-    }
+    scene.add(Config.light);
   }
 
   var render = function() {
