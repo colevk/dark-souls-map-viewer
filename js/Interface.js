@@ -4,25 +4,32 @@ Interface = new function () {
   self.setupInterface = function () {
     $('#ds2').toggle();
 
-    ds1State = Config.ds1State;
-    ds2State = Config.ds2State;
+    for (var i = 0; i < 2; i++) {
+      var names = [Config.ds1, Config.ds2][i];
+      var state = [Config.ds1State, Config.ds2State][i];
+      var game = ['ds1', 'ds2'][i];
 
-    for (var i = 0; i < Config.ds1.length; i++) {
-      var checked = ds1State[i] ? ' checked' : '';
-      var elem = $('<label><input type="checkbox" name="ds1" value="' +
-                  i + '"' + checked +'><span>' + Config.ds1[i] +
-                  '</span><br></label>')
+      for (var j = 0; j < names.length; j++) {
+        var checkbox = $('<input type="checkbox">');
+        checkbox.attr('name', game);
+        checkbox.attr('value', j);
+        if (state[j]) {
+          checkbox.attr('checked', '');
+        }
 
-      $('#ds1').append(elem);
-    }
+        checkbox.change((function (gameNumber, fileNumber) {
+          return function () {
+            self.addRemove(gameNumber, fileNumber, $(this).is(':checked'));
+          }
+        })(game, j));
 
-    for (var i = 0; i < Config.ds2.length; i++) {
-      var checked = ds2State[i] ? ' checked' : '';
-      var elem = $('<label><input type="checkbox" name="ds2" value="' +
-                  i + '"' + checked +'><span>' + Config.ds2[i] +
-                  '</span><br></label>')
+        var label = $('<label>');
+        label.append(checkbox);
+        label.append($('<span>' + names[j] + '</span>'));
+        label.append($('<br>'));
 
-      $('#ds2').append(elem);
+        $('#' + game).append(label);
+      }
     }
 
     if (material.uniforms.normalShading.value) {
@@ -80,46 +87,43 @@ Interface = new function () {
     $('#ds1').toggle();
     $('#ds2').toggle();
 
-    currentGame = (currentGame === 'ds1') ? 'ds2' : 'ds1';
-    var newState = (currentGame === 'ds1') ? ds1State : ds2State
-
+    var toRemove = [];
+    $('input[name=' + currentGame + ']:checked').each(function () {
+      toRemove.push(parseInt($(this).val()));
+    });
     for (var i = 0; i < meshes.length; i++) {
       var mesh = meshes[i];
-      if (mesh.game !== currentGame) {
+      if (mesh.game === currentGame && toRemove.indexOf(mesh.fileNumber) >= 0) {
         scene.remove(mesh);
-      } else if (newState[mesh.fileNumber]) {
+      }
+    }
+
+    currentGame = (currentGame === 'ds1') ? 'ds2' : 'ds1';
+
+    var toAdd = [];
+    $('input[name=' + currentGame + ']:checked').map(function () {
+      toAdd.push(parseInt($(this).val()));
+    });
+    for (var i = 0; i < meshes.length; i++) {
+      var mesh = meshes[i];
+      if (mesh.game === currentGame && toAdd.indexOf(mesh.fileNumber) >= 0) {
         scene.add(mesh);
       }
     }
   }
 
-  self.addRemove = function () {
-    var newState = [];
-    var oldState = (currentGame === 'ds1') ? ds1State : ds2State;
-    $('input[name=' + currentGame +']:checked').each(function () {
-      newState[parseInt(this.value)] = true;
-    });
-    var toAdd = [];
-    var toRemove = [];
-    for (var i = 0; i < oldState.length; i++) {
-      if (newState[i] === undefined) { newState[i] = false; }
-      if (newState[i] && ! oldState[i]) {
-        toAdd.push(i);
-        oldState[i] = true;
-      } else if (! newState[i] && oldState[i]) {
-        toRemove.push(i);
-        oldState[i] = false;
-      }
+  self.addRemove = function (game, fileNumber, shouldAdd) {
+    var addRemoveFunc;
+    if (shouldAdd) {
+      addRemoveFunc = function (mesh) { scene.add(mesh); }
+    } else {
+      addRemoveFunc = function (mesh) { scene.remove(mesh); }
     }
 
     for (var i = 0; i < meshes.length; i++) {
       var mesh = meshes[i];
-      if (mesh.game === currentGame) {
-        if (toAdd.indexOf(mesh.fileNumber) >= 0) {
-          scene.add(mesh);
-        } else if (toRemove.indexOf(mesh.fileNumber) >= 0) {
-          scene.remove(mesh);
-        }
+      if (mesh.game === game && mesh.fileNumber === fileNumber) {
+        addRemoveFunc(mesh);
       }
     }
   }

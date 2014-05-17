@@ -17,22 +17,25 @@
 
 <body style="overflow:hidden;">
   <div id="sidebar" style="height: 100vh; width: 25rem; float: right; overflow: auto">
-    <label><input id="normalShading" type="checkbox" onchange="Interface.toggleNormalShading()">Normal Shading</label><br>
-    <label><input id="edgeHighlight" type="checkbox" onchange="Interface.toggleEdgeHighlighting()">Edge Highlighting</label><br>
-    <label><input id="backfaceCulling" type="checkbox" onchange="Interface.toggleBackfaceCulling()">Cull Backfaces</label><br>
-    <label><input id="wrapAround" type="checkbox" onchange="Interface.toggleWrapAround()">Wrap-around Lighting</label><br>
-    <input type="color" value="#000000" onchange="Interface.setEdgeColor(this.value)">Edge Color<br>
-    <input type="color" value="#ffffff" onchange="Interface.setLightColor(this.value)">Light Color<br>
+    <label><input id="normalShading" type="checkbox" onchange="Interface.toggleNormalShading()">Show normals</label><br>
+    <label><input id="edgeHighlight" type="checkbox" onchange="Interface.toggleEdgeHighlighting()">Highlight edges</label><br>
+    <label><input id="backfaceCulling" type="checkbox" onchange="Interface.toggleBackfaceCulling()">Cull backfaces</label><br>
+    <label><input id="wrapAround" type="checkbox" onchange="Interface.toggleWrapAround()">Wrap-around lighting</label><br>
+    <input type="color" value="#000000" onchange="Interface.setEdgeColor(this.value)">Edge color<br>
+    <input type="color" value="#ffffff" onchange="Interface.setLightColor(this.value)">Light color<br>
     <button onclick="Interface.resetCamera()">Reset camera position</button><br>
-    <button onclick="Interface.swapGames()">Swap games</button><br>
-    <form id="ds1" onchange="Interface.addRemove()"></form>
-    <form id="ds2" onchange="Interface.addRemove()"></form>
+    <select onchange="Interface.swapGames()">
+      <option value="ds1">Dark Souls 1</option>
+      <option value="ds2">Dark Souls 2</option>
+    </select>
+    <form id="ds1"></form>
+    <form id="ds2"></form>
   </div>
   <div id="canvas" style="height: 100vh; margin-right: 25rem;"></div>
 
   <script>
-  var sidebar, canvas, renderer, clock, scene, camera, controls, material;
-  var meshes, currentGame, ds1State, ds2State;
+  var sidebar, canvas, renderer, clock, scene, camera, controls, material,
+      meshes, currentGame;
 
   function init() {
     sidebar = $('#sidebar');
