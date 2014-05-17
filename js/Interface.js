@@ -1,5 +1,7 @@
 Interface = new function () {
-  this.setupInterface = function () {
+  var self = this;
+
+  self.setupInterface = function () {
     $('#ds2').toggle();
 
     ds1State = Config.ds1State;
@@ -40,7 +42,7 @@ Interface = new function () {
     }
   }
 
-  this.toggleBackfaceCulling = function () {
+  self.toggleBackfaceCulling = function () {
     if (material.side === THREE.DoubleSide) {
       material.side = THREE.FrontSide;
     } else {
@@ -48,33 +50,33 @@ Interface = new function () {
     }
   }
 
-  this.toggleWrapAround = function () {
+  self.toggleWrapAround = function () {
     material.uniforms.wrapAround.value = !material.uniforms.wrapAround.value;
   }
 
-  this.toggleNormalShading = function () {
+  self.toggleNormalShading = function () {
     material.uniforms.normalShading.value = !material.uniforms.normalShading.value;
   }
 
-  this.toggleEdgeHighlighting = function () {
+  self.toggleEdgeHighlighting = function () {
     material.uniforms.edgeHighlight.value = !material.uniforms.edgeHighlight.value;
   }
 
-  this.setEdgeColor = function (color) {
+  self.setEdgeColor = function (color) {
     var tmpColor = new THREE.Color(color);
     material.uniforms.edgeColor.value = new THREE.Vector3(tmpColor.r, tmpColor.g, tmpColor.b);
   }
 
-  this.setLightColor = function (color) {
+  self.setLightColor = function (color) {
     Config.light.color = new THREE.Color(color);
   }
 
-  this.resetCamera = function () {
+  self.resetCamera = function () {
     camera.position = Config.defaultCameraPosition();
     camera.lookAt(Config.defaultCameraLookAt());
   }
 
-  this.swapGames = function () {
+  self.swapGames = function () {
     $('#ds1').toggle();
     $('#ds2').toggle();
 
@@ -91,7 +93,7 @@ Interface = new function () {
     }
   }
 
-  this.addRemove = function () {
+  self.addRemove = function () {
     var newState = [];
     var oldState = (currentGame === 'ds1') ? ds1State : ds2State;
     $('input[name=' + currentGame +']:checked').each(function () {

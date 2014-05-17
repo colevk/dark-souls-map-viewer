@@ -7,7 +7,7 @@ SceneLoader = new function () {
   this.loadIVFile = function (filename, fileNumber, onloadFunction) {
     var request = new XMLHttpRequest();
 
-    request.onreadystatechange = function() {
+    request.onreadystatechange = function () {
       if (request.readyState == 4) {
         var data = new Uint8Array(request.response);
 
@@ -66,13 +66,13 @@ SceneLoader = new function () {
     var vertRequest = new XMLHttpRequest();
     var fragRequest = new XMLHttpRequest();
 
-    vertRequest.onreadystatechange = function() {
+    vertRequest.onreadystatechange = function () {
       if (vertRequest.readyState == 4) {
         material.vertexShader = vertRequest.responseText;
       }
     };
 
-    fragRequest.onreadystatechange = function() {
+    fragRequest.onreadystatechange = function () {
       if (fragRequest.readyState == 4) {
         material.fragmentShader = fragRequest.responseText;
       }
