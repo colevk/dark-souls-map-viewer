@@ -1,12 +1,12 @@
-Interface = new function () {
+Interface = function (scene, camera, meshes, material, config) {
   var self = this;
 
   self.setupInterface = function () {
     $('#ds2').toggle();
 
     for (var i = 0; i < 2; i++) {
-      var names = [Config.ds1, Config.ds2][i];
-      var state = [Config.ds1State, Config.ds2State][i];
+      var names = [config.ds1, config.ds2][i];
+      var state = [config.ds1State, config.ds2State][i];
       var game = ['ds1', 'ds2'][i];
 
       for (var j = 0; j < names.length; j++) {
@@ -74,7 +74,7 @@ Interface = new function () {
   }
 
   self.setLightColor = function (color) {
-    Config.light.color = new THREE.Color(color);
+    config.light.color = new THREE.Color(color);
   }
 
   self.resetCamera = function () {
@@ -82,22 +82,9 @@ Interface = new function () {
     camera.lookAt(Config.defaultCameraLookAt());
   }
 
-  self.swapGames = function () {
-    $('#ds1').toggle();
-    $('#ds2').toggle();
-
-    var toRemove = [];
-    $('input[name=' + currentGame + ']:checked').each(function () {
-      toRemove.push(parseInt($(this).val()));
-    });
-    for (var i = 0; i < meshes.length; i++) {
-      var mesh = meshes[i];
-      if (mesh.game === currentGame && toRemove.indexOf(mesh.fileNumber) >= 0) {
-        scene.remove(mesh);
-      }
-    }
-
-    currentGame = (currentGame === 'ds1') ? 'ds2' : 'ds1';
+  self.swapGames = function (currentGame) {
+    $('.file-list').hide();
+    $('#' + currentGame).show();
 
     var toAdd = [];
     $('input[name=' + currentGame + ']:checked').map(function () {
@@ -107,22 +94,21 @@ Interface = new function () {
       var mesh = meshes[i];
       if (mesh.game === currentGame && toAdd.indexOf(mesh.fileNumber) >= 0) {
         scene.add(mesh);
+      } else {
+        scene.remove(mesh);
       }
     }
   }
 
   self.addRemove = function (game, fileNumber, shouldAdd) {
-    var addRemoveFunc;
-    if (shouldAdd) {
-      addRemoveFunc = function (mesh) { scene.add(mesh); }
-    } else {
-      addRemoveFunc = function (mesh) { scene.remove(mesh); }
-    }
-
     for (var i = 0; i < meshes.length; i++) {
       var mesh = meshes[i];
       if (mesh.game === game && mesh.fileNumber === fileNumber) {
-        addRemoveFunc(mesh);
+        if (shouldAdd) {
+          scene.add(mesh);
+        } else {
+          scene.remove(mesh);
+        }
       }
     }
   }

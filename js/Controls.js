@@ -17,9 +17,6 @@ Controls = function ( object, domElement ) {
   this.movementSpeedMultiplier = 1;
   this.rollSpeed = 2;
 
-  this.dragToLook = true;
-  this.autoForward = false;
-
   // disable default target object behavior
 
   // internals
@@ -49,8 +46,6 @@ Controls = function ( object, domElement ) {
       return;
 
     }
-
-    //event.preventDefault();
 
     switch ( event.keyCode ) {
 
@@ -105,28 +100,13 @@ Controls = function ( object, domElement ) {
     event.preventDefault();
     event.stopPropagation();
 
-    if ( this.dragToLook ) {
-
-      this.mouseStatus ++;
-
-    } else {
-
-      switch ( event.button ) {
-
-        case 0: this.moveState.forward = 1; break;
-        case 2: this.moveState.back = 1; break;
-
-      }
-
-      this.updateMovementVector();
-
-    }
+    this.mouseStatus ++;
 
   };
 
   this.mousemove = function( event ) {
 
-    if ( !this.dragToLook || this.mouseStatus > 0 ) {
+    if ( this.mouseStatus > 0 ) {
 
       var container = this.getContainerDimensions();
       var halfWidth  = container.size[ 0 ] / 2;
@@ -146,24 +126,9 @@ Controls = function ( object, domElement ) {
     event.preventDefault();
     event.stopPropagation();
 
-    if ( this.dragToLook ) {
+    this.mouseStatus --;
 
-      this.mouseStatus --;
-
-      this.moveState.yawLeft = this.moveState.pitchDown = 0;
-
-    } else {
-
-      switch ( event.button ) {
-
-        case 0: this.moveState.forward = 0; break;
-        case 2: this.moveState.back = 0; break;
-
-      }
-
-      this.updateMovementVector();
-
-    }
+    this.moveState.yawLeft = this.moveState.pitchDown = 0;
 
     this.updateRotationVector();
 
@@ -191,11 +156,9 @@ Controls = function ( object, domElement ) {
 
   this.updateMovementVector = function() {
 
-    var forward = ( this.moveState.forward || ( this.autoForward && !this.moveState.back ) ) ? 1 : 0;
-
     this.moveVector.x = ( -this.moveState.left    + this.moveState.right );
     this.moveVector.y = ( -this.moveState.down    + this.moveState.up );
-    this.moveVector.z = ( -forward + this.moveState.back );
+    this.moveVector.z = ( -this.moveState.forward + this.moveState.back );
 
   };
 

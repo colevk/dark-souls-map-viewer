@@ -1,10 +1,12 @@
 SceneLoader = new function () {
+  var self = this;
+
   var vertexNumber = new Float32Array(810000);
   for (var i = 0; i < vertexNumber.length; i++) {
     vertexNumber[i] = i % 3;
   }
 
-  this.loadIVFile = function (filename, fileNumber, onloadFunction) {
+  self.loadIVFile = function (filename, fileNumber, onloadFunction) {
     var request = new XMLHttpRequest();
 
     request.onreadystatechange = function () {
@@ -59,29 +61,5 @@ SceneLoader = new function () {
     request.open('GET', filename, true);
     request.responseType = 'arraybuffer'
     request.send();
-  }
-
-
-  this.loadShader = function (vertShader, fragShader, material) {
-    var vertRequest = new XMLHttpRequest();
-    var fragRequest = new XMLHttpRequest();
-
-    vertRequest.onreadystatechange = function () {
-      if (vertRequest.readyState == 4) {
-        material.vertexShader = vertRequest.responseText;
-      }
-    };
-
-    fragRequest.onreadystatechange = function () {
-      if (fragRequest.readyState == 4) {
-        material.fragmentShader = fragRequest.responseText;
-      }
-    };
-
-    vertRequest.open('GET', vertShader, true);
-    fragRequest.open('GET', fragShader, true);
-
-    vertRequest.send();
-    fragRequest.send();
   }
 }
