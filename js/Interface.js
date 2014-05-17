@@ -25,8 +25,7 @@ Interface = new function () {
 
         var label = $('<label>');
         label.append(checkbox);
-        label.append($('<span>' + names[j] + '</span>'));
-        label.append($('<br>'));
+        label.append($('<span> ' + names[j] + '</span>'));
 
         $('#' + game).append(label);
       }

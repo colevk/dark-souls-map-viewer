@@ -4,6 +4,15 @@
   <meta charset="utf-8" />
   <title>Dark Souls Map Viewer</title>
   <link href="css/reset.css" rel="stylesheet" type="text/css">
+  <link href="css/foundation.min.css" rel="stylesheet" type="text/css">
+  <style>
+  input {
+    margin-bottom: 0.5rem !important;
+  }
+  button {
+    margin-bottom: 0rem !important;
+  }
+  </style>
 
   <script src="js/lib/jquery-2.1.1.min.js"></script>
   <script src="js/lib/three.js"></script>
@@ -16,14 +25,17 @@
 </head>
 
 <body style="overflow:hidden;">
-  <div id="sidebar" style="height: 100vh; width: 25rem; float: right; overflow: auto">
-    <label><input id="normalShading" type="checkbox" onchange="Interface.toggleNormalShading()">Show normals</label><br>
-    <label><input id="edgeHighlight" type="checkbox" onchange="Interface.toggleEdgeHighlighting()">Highlight edges</label><br>
-    <label><input id="backfaceCulling" type="checkbox" onchange="Interface.toggleBackfaceCulling()">Cull backfaces</label><br>
-    <label><input id="wrapAround" type="checkbox" onchange="Interface.toggleWrapAround()">Wrap-around lighting</label><br>
-    <input type="color" value="#000000" onchange="Interface.setEdgeColor(this.value)">Edge color<br>
-    <input type="color" value="#ffffff" onchange="Interface.setLightColor(this.value)">Light color<br>
-    <button onclick="Interface.resetCamera()">Reset camera position</button><br>
+  <div id="sidebar" class="panel" style="height: 100vh; width: 25rem; float: right; overflow: auto">
+    <h4>Dark Souls Map Viewer</h4>
+    <hr>
+    <label><input id="normalShading" type="checkbox" onchange="Interface.toggleNormalShading()"> Show normals</label>
+    <label><input id="edgeHighlight" type="checkbox" onchange="Interface.toggleEdgeHighlighting()"> Highlight edges</label>
+    <label><input id="backfaceCulling" type="checkbox" onchange="Interface.toggleBackfaceCulling()"> Cull backfaces</label>
+    <label><input id="wrapAround" type="checkbox" onchange="Interface.toggleWrapAround()"> Wrap-around lighting</label>
+    <label><input type="color" value="#000000" onchange="Interface.setEdgeColor(this.value)"> Edge color</label>
+    <label><input type="color" value="#ffffff" onchange="Interface.setLightColor(this.value)"> Light color</label>
+    <button class="button tiny" onclick="Interface.resetCamera()">Reset camera position</button>
+    <hr>
     <select onchange="Interface.swapGames()">
       <option value="ds1">Dark Souls 1</option>
       <option value="ds2">Dark Souls 2</option>
@@ -31,7 +43,7 @@
     <form id="ds1"></form>
     <form id="ds2"></form>
   </div>
-  <div id="canvas" style="height: 100vh; margin-right: 25rem;"></div>
+  <div id="canvas" style="height: 100%; margin-right: 25rem;"></div>
 
   <script>
   var sidebar, canvas, renderer, clock, scene, camera, controls, material,
@@ -92,6 +104,12 @@
     controls.update(clock.getDelta());
     renderer.render(scene, camera);
   };
+
+  $(window).resize(function () {
+    renderer.setSize(canvas.width(), canvas.height());
+    camera.aspect = canvas.width() / canvas.height();
+    camera.updateProjectionMatrix();
+  })
 
   init();
   Interface.setupInterface();
