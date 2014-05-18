@@ -170,8 +170,8 @@ function PointerLockControls(object, domElement) {
 		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-		self.moveState.yawLeft = - movementX * 0.1;
-		self.moveState.pitchDown = movementY * 0.1;
+		self.moveState.yawLeft = - movementX * 0.07;
+		self.moveState.pitchDown = movementY * 0.07;
 
     self.updateRotationVector();
 	};
@@ -179,7 +179,7 @@ function PointerLockControls(object, domElement) {
   /**
    * Make view slow to a halt in absence of mouse movement.
    */
-  self.adjust = function () {
+  self.adjust = function() {
     self.moveState.yawLeft *= 0.8;
     self.moveState.pitchDown *= 0.8;
     self.updateRotationVector();

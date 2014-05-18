@@ -29,7 +29,7 @@
     <h4>Dark Souls Map Viewer</h4>
     <hr>
     <label>
-      W, A, S, D, Q, E &mdash; Move<br>
+      W, A, S, D, R, F &mdash; Move<br>
       Shift &mdash; Speed up<br>
       Mouse &mdash; Look<br>
     </label>
@@ -55,12 +55,15 @@
   var sidebar, canvas, renderer, clock, scene, camera, controls, material,
       meshes, interface;
 
+  /**
+   * Create and set all global variables and controls
+   */
   function init() {
     sidebar = $('#sidebar');
     canvas = $('#canvas');
 
     renderer = new THREE.WebGLRenderer();
-    renderer.setSize( canvas.width(), canvas.height() );
+    renderer.setSize(canvas.width(), canvas.height());
     canvas.append(renderer.domElement);
 
     clock = new THREE.Clock();
@@ -69,7 +72,8 @@
 
     camera = new THREE.PerspectiveCamera( 75, canvas.width() / canvas.height(), 0.1, 10000 );
 
-    $(window).resize(function () {
+    // Reset aspect ratio when window is resized
+    $(window).resize(function() {
       renderer.setSize(canvas.width(), canvas.height());
       camera.aspect = canvas.width() / canvas.height();
       camera.updateProjectionMatrix();
@@ -79,12 +83,14 @@
                           'mozPointerLockElement' in document ||
                           'webkitPointerLockElement' in document;
 
+    // Only use pointer lock controls if browser supports them
     if (havePointerLock) {
       controls = new PointerLockControls(camera, renderer.domElement);
 
       var element = canvas.get()[0];
 
-			var pointerlockchange = function ( event ) {
+      // Enable controls only when pointer is locked.
+			var pointerlockchange = function() {
 				if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
 					controls.enabled = true;
 				} else {
@@ -93,15 +99,18 @@
 			}
 
 			// Hook pointer lock state change events
-			document.addEventListener( 'pointerlockchange', pointerlockchange, false );
-			document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
-			document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
+			document.addEventListener('pointerlockchange', pointerlockchange, false);
+			document.addEventListener('mozpointerlockchange', pointerlockchange, false);
+			document.addEventListener('webkitpointerlockchange', pointerlockchange, false);
 
-			canvas.click(function ( event ) {
-				element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+			canvas.click(function() {
+				element.requestPointerLock = element.requestPointerLock ||
+                                     element.mozRequestPointerLock ||
+                                     element.webkitRequestPointerLock;
 				element.requestPointerLock();
 			});
     } else {
+      // Use backup controls
       controls = new NoPointerLockControls(camera, renderer.domElement);
     }
 
@@ -110,6 +119,8 @@
 
     meshes = [];
 
+    // Load dark souls 1 files into meshes, annotated with their game and file
+    // that they are associated with.
     for (var i = 0, lenI = Config.ds1.length; i < lenI; i++) {
       (function(fileNumber) { // pass loop variable into scope
         function loadFunc(bufferGeometry) {
@@ -118,6 +129,7 @@
           mesh.fileNumber = fileNumber;
           meshes.push(mesh);
 
+          // Make default files visible.
           if (Config.ds1State[fileNumber]) { scene.add(mesh); }
         };
 
@@ -125,9 +137,11 @@
       })(i);
     }
 
-    for (var i = 0; i < Config.ds2.length; i++) {
+    // Load dark souls 2 files into meshes, annotated with their game and file
+    // that they are associated with.
+    for (var i = 0, lenI = Config.ds2.length; i < lenI; i++) {
       (function(fileNumber) { // pass loop variable into scope
-        var loadFunc = function (bufferGeometry) {
+        function loadFunc(bufferGeometry) {
           var mesh = new THREE.Mesh(bufferGeometry, BigShaderMaterial);
           mesh.game = 'ds2';
           mesh.fileNumber = fileNumber;
@@ -139,10 +153,11 @@
     }
 
     scene.add(Config.light);
-
-    interface = new Interface(scene, camera, meshes, material, Config);
   }
 
+  /**
+   * Render the scene and update controls.
+   */
   function render() {
     requestAnimationFrame(render);
 
@@ -150,7 +165,9 @@
     renderer.render(scene, camera);
   };
 
+  // Run the program.
   init();
+  interface = new Interface(scene, camera, meshes, material, Config);
   interface.setupInterface();
   render();
   </script>
