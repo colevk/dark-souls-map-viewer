@@ -7,7 +7,7 @@
   <link href="css/foundation.min.css" rel="stylesheet" type="text/css">
   <style>
   input {
-    margin-bottom: 0.5rem !important;
+    margin-bottom: 0.2rem !important;
   }
   button {
     margin-bottom: 0rem !important;
@@ -19,7 +19,8 @@
 
   <script src="js/BigShader.js"></script>
   <script src="js/Interface.js"></script>
-  <script src="js/Controls.js"></script>
+  <script src="js/PointerLockControls.js"></script>
+  <script src="js/NoPointerLockControls.js"></script>
   <script src="js/SceneLoader.js"></script>
   <script src="js/Config.js"></script>
 </head>
@@ -27,6 +28,12 @@
 <body style="overflow:hidden;">
   <div id="sidebar" class="panel" style="height: 100vh; width: 25rem; float: right; overflow: auto">
     <h4>Dark Souls Map Viewer</h4>
+    <hr>
+    <label>
+      W, A, S, D, Q, E &mdash; Move<br>
+      Shift &mdash; Speed up<br>
+      Mouse &mdash; Look<br>
+    </label>
     <hr>
     <label><input id="normalShading" type="checkbox" onchange="interface.toggleNormalShading()"> Show normals</label>
     <label><input id="edgeHighlight" type="checkbox" onchange="interface.toggleEdgeHighlighting()"> Highlight edges</label>
@@ -67,13 +74,36 @@
                           'mozPointerLockElement' in document ||
                           'webkitPointerLockElement' in document;
 
-    controls = new Controls(camera, renderer.domElement);
+    if (havePointerLock) {
+      controls = new PointerLockControls(camera, renderer.domElement);
+
+      var element = canvas.get()[0];
+
+			var pointerlockchange = function ( event ) {
+				if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
+					controls.enabled = true;
+				} else {
+					controls.enabled = false;
+				}
+			}
+
+			// Hook pointer lock state change events
+			document.addEventListener( 'pointerlockchange', pointerlockchange, false );
+			document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
+			document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
+
+			canvas.click(function ( event ) {
+				element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
+				element.requestPointerLock();
+			});
+    } else {
+      controls = new NoPointerLockControls(camera, renderer.domElement);
+    }
 
     camera.position = Config.defaultCameraPosition();
     camera.lookAt(Config.defaultCameraLookAt());
 
     meshes = [];
-    currentGame = 'ds1';
 
     for (var i = 0; i < Config.ds1.length; i++) {
       function loadFunc(bufferGeometry, fileNumber) {

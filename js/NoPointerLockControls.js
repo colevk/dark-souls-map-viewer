@@ -3,7 +3,7 @@
  * modified by Cole van Krieken
  */
 
-Controls = function ( object, domElement ) {
+NoPointerLockControls = function ( object, domElement ) {
 
   this.object = object;
   this.object.rotation.order = "YZX";
@@ -57,8 +57,8 @@ Controls = function ( object, domElement ) {
       case 65: /*A*/ this.moveState.left = 1; break;
       case 68: /*D*/ this.moveState.right = 1; break;
 
-      case 81: /*Q*/ this.moveState.up = 1; break;
-      case 69: /*E*/ this.moveState.down = 1; break;
+      case 82: /*R*/ this.moveState.up = 1; break;
+      case 70: /*F*/ this.moveState.down = 1; break;
 
     }
 
@@ -79,8 +79,8 @@ Controls = function ( object, domElement ) {
       case 65: /*A*/ this.moveState.left = 0; break;
       case 68: /*D*/ this.moveState.right = 0; break;
 
-      case 81: /*Q*/ this.moveState.up = 0; break;
-      case 69: /*E*/ this.moveState.down = 0; break;
+      case 82: /*R*/ this.moveState.up = 0; break;
+      case 70: /*F*/ this.moveState.down = 0; break;
 
     }
 
@@ -151,6 +151,12 @@ Controls = function ( object, domElement ) {
 
     // keep view level
     this.object.rotation.z = 0;
+
+    if (this.object.rotation.x > Math.PI / 2) {
+      this.object.rotation.x = Math.PI / 2;
+    } else if (this.object.rotation.x < -Math.PI / 2) {
+      this.object.rotation.x = -Math.PI / 2;
+    }
 
   };
 
