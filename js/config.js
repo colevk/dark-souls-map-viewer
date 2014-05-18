@@ -1,4 +1,8 @@
+/**
+ * Configuration data for setting up the viewer.
+ */
 Config = new function () {
+  // Dark Souls 1 filenames.
   this.ds1 = [
     "Anor Londo",
     "Ash Lake",
@@ -19,6 +23,7 @@ Config = new function () {
     "Undead Burg",
   ];
 
+  // Which Dark Souls 1 files should be visible by default.
   this.ds1State = [
     true,
     true,
@@ -39,6 +44,7 @@ Config = new function () {
     true,
   ];
 
+  // Dark Souls 2 filenames.
   this.ds2 = [
     "Aldia's Keep",
     "Brightstone Cove Tseldora + Lord's Private Chamber",
@@ -66,6 +72,7 @@ Config = new function () {
     "Undead Crypt",
   ];
 
+  // Which Dark Souls 2 file should be visible by default.
   this.ds2State = [
     false,
     false,
@@ -93,13 +100,16 @@ Config = new function () {
     false,
   ]
 
+  // Basic lighting.
   this.light = new THREE.DirectionalLight(0xffffff);
   this.light.position.set(1, 2, 3);
 
+  // Default camera position for best view
   this.defaultCameraPosition = function () {
     return new THREE.Vector3(-20, 40, 0);
   }
 
+  // Default camera direction for best view
   this.defaultCameraLookAt = function () {
     return new THREE.Vector3(-100, 0, 40);
   }

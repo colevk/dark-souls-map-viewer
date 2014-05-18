@@ -137,7 +137,7 @@ function BaseControls(object, domElement) {
     self.object.rotation.z = 0;
 
     // Don't rotate beyond vertical.
-    self.object.rotation.x = clamp(self.object.rotation.x, - PI_2, PI_2);
+    self.object.rotation.x = clamp(self.object.rotation.x, -PI_2, PI_2);
 
     // Perform any other adjustments
     self.adjust();
