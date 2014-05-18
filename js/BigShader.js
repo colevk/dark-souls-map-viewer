@@ -1,32 +1,32 @@
+/**
+ * Shader program that does edge detection and lambert shading, and accepts a
+ * number of switches. Having everything together in one big shader with
+ * switches is probably bad practice. Edge detection based on Florian Boesch's
+ * code at {@link http://goo.gl/qKkDPr}.
+ */
 BigShader = {
-
   attributes: {
-
     "vertexNumber": { type: 'f' }
-
   },
 
   uniforms: {
-
     "edgeColor":     { type: "v3", value: new THREE.Vector3(0, 0, 0) },
     "edgeHighlight": { type: "f", value: 0.0 },
     "wrapAround":    { type: "f", value: 1.0 },
     "normalShading": { type: "f", value: 0.0 }
-
   },
 
   vertexShader: [
-
     "attribute float vertexNumber;",
 
     "varying vec3 vNormal;",
     "varying vec3 vBC;",
 
     "void main() {",
-
       "vNormal = normal;",
       "vBC = vec3(0.0);",
 
+      // Convert vertex number to barycentric coordinates
       "if (vertexNumber < 0.5) {",
         "vBC.x = 1.0;",
       "} else if (vertexNumber < 1.5) {",
@@ -36,13 +36,10 @@ BigShader = {
       "}",
 
       "gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
-
     "}"
-
   ].join("\n"),
 
   fragmentShader: [
-
     "#extension GL_OES_standard_derivatives : enable",
 
     "uniform vec3 edgeColor;",
@@ -60,16 +57,14 @@ BigShader = {
     "varying vec3 vNormal;",
     "varying vec3 vBC;",
 
+    // Calculates closeness to edge of triangle.
     "float edgeFactor() {",
-
         "vec3 d = fwidth(vBC);",
         "vec3 a3 = smoothstep(vec3(0.0), d, vBC);",
         "return min(min(a3.x, a3.y), a3.z);",
-
     "}",
 
     "void main() {",
-
         "vec3 normal;",
 
         "if (gl_FrontFacing) {",
@@ -78,13 +73,17 @@ BigShader = {
           "normal = -vNormal;",
         "}",
 
+        // Ambient lighting
         "vec3 faceColor = ambientLightColor;",
 
+        // Basic lambert shading for directional lights only
         "#if (MAX_DIR_LIGHTS > 0)",
           "for (int i = 0; i < MAX_DIR_LIGHTS; i++) {",
             "float intensity = dot(normalize(normal),",
                                   "normalize(directionalLightDirection[i]));",
 
+            // With wrapAround, light intensity drops to 0 only directly
+            // opposite the light, rather than perpendicular and beyond.
             "if (wrapAround > 0.0) {",
               "intensity = 0.5 + 0.5 * intensity;",
             "}",
@@ -94,6 +93,7 @@ BigShader = {
           "}",
         "#endif",
 
+        // Show surface normal in place of computed color.
         "if (normalShading > 0.0) {",
           "if (wrapAround > 0.0) {",
             "faceColor = vec3(0.5) + 0.5 * normal;",
@@ -102,19 +102,19 @@ BigShader = {
           "}",
         "}",
 
+        // Highlight edges
         "if (edgeHighlight > 0.0) {",
           "faceColor = mix(edgeColor, faceColor, edgeFactor());",
         "}",
 
         "gl_FragColor = vec4(faceColor, 1.0);",
-
     "}"
-
   ].join("\n")
-
 };
 
-
+/**
+ * Compiles the shader into a THREE.Material for use in meshes.
+ */
 BigShaderMaterial = new THREE.ShaderMaterial({
   side: THREE.DoubleSide,
   lights: true,

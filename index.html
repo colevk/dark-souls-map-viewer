@@ -69,6 +69,12 @@
 
     camera = new THREE.PerspectiveCamera( 75, canvas.width() / canvas.height(), 0.1, 10000 );
 
+    $(window).resize(function () {
+      renderer.setSize(canvas.width(), canvas.height());
+      camera.aspect = canvas.width() / canvas.height();
+      camera.updateProjectionMatrix();
+    })
+
     var havePointerLock = 'pointerLockElement' in document ||
                           'mozPointerLockElement' in document ||
                           'webkitPointerLockElement' in document;
@@ -104,28 +110,32 @@
 
     meshes = [];
 
-    for (var i = 0; i < Config.ds1.length; i++) {
-      function loadFunc(bufferGeometry, fileNumber) {
-        var mesh = new THREE.Mesh(bufferGeometry, BigShaderMaterial);
-        mesh.game = 'ds1';
-        mesh.fileNumber = fileNumber;
-        meshes.push(mesh);
+    for (var i = 0, lenI = Config.ds1.length; i < lenI; i++) {
+      (function(fileNumber) { // pass loop variable into scope
+        function loadFunc(bufferGeometry) {
+          var mesh = new THREE.Mesh(bufferGeometry, BigShaderMaterial);
+          mesh.game = 'ds1';
+          mesh.fileNumber = fileNumber;
+          meshes.push(mesh);
 
-        if (Config.ds1State[fileNumber]) { scene.add(mesh); }
-      };
+          if (Config.ds1State[fileNumber]) { scene.add(mesh); }
+        };
 
-      SceneLoader.loadIVFile('data/ds1/' + Config.ds1[i] + '.iv', i, loadFunc);
+        SceneLoader.loadIVFile('data/ds1/' + Config.ds1[i] + '.iv', loadFunc);
+      })(i);
     }
 
     for (var i = 0; i < Config.ds2.length; i++) {
-      var loadFunc = function (bufferGeometry, fileNumber) {
-        var mesh = new THREE.Mesh(bufferGeometry, BigShaderMaterial);
-        mesh.game = 'ds2';
-        mesh.fileNumber = fileNumber;
-        meshes.push(mesh);
-      };
+      (function(fileNumber) { // pass loop variable into scope
+        var loadFunc = function (bufferGeometry) {
+          var mesh = new THREE.Mesh(bufferGeometry, BigShaderMaterial);
+          mesh.game = 'ds2';
+          mesh.fileNumber = fileNumber;
+          meshes.push(mesh);
+        };
 
-      SceneLoader.loadIVFile('data/ds2/' + Config.ds2[i] + '.iv', i, loadFunc);
+        SceneLoader.loadIVFile('data/ds2/' + Config.ds2[i] + '.iv', loadFunc);
+      })(i);
     }
 
     scene.add(Config.light);
@@ -133,18 +143,12 @@
     interface = new Interface(scene, camera, meshes, material, Config);
   }
 
-  var render = function() {
+  function render() {
     requestAnimationFrame(render);
 
     controls.update(clock.getDelta());
     renderer.render(scene, camera);
   };
-
-  $(window).resize(function () {
-    renderer.setSize(canvas.width(), canvas.height());
-    camera.aspect = canvas.width() / canvas.height();
-    camera.updateProjectionMatrix();
-  })
 
   init();
   interface.setupInterface();

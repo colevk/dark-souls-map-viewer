@@ -1,15 +1,27 @@
-SceneLoader = new function () {
+/**
+ * Holds the iv file loading function and some helper variables.
+ */
+SceneLoader = new function() {
   var self = this;
 
+  // To be passed as a attribute to the shader, to be used in edge detection.
+  // Always the same, so shared between all geometries.
   var vertexNumber = new Float32Array(810000);
-  for (var i = 0; i < vertexNumber.length; i++) {
+  for (var i = 0, lenI = vertexNumber.length; i < lenI; i++) {
     vertexNumber[i] = i % 3;
   }
 
-  self.loadIVFile = function (filename, fileNumber, onloadFunction) {
+  /**
+   * Loads an iv file asychronously, puts it into a number of
+   *   THREE.BufferGeometry, and performs a callback when it's done.
+   * @param {string} filename Location of the file.
+   * @param {function(THREE.BufferGeometry)} onloadFunction Callback to perform
+   *   on the loaded BufferGeometries.
+   */
+  self.loadIVFile = function(filename, onloadFunction) {
     var request = new XMLHttpRequest();
 
-    request.onreadystatechange = function () {
+    request.onreadystatechange = function() {
       if (request.readyState == 4) {
         var data = new Uint8Array(request.response);
 
@@ -20,6 +32,7 @@ SceneLoader = new function () {
 
           var modeldata = new Uint32Array(data.buffer.slice(16 * (i + 1), 16 * (i + 1) + 16));
           var tris_offset  = modeldata[0];
+          // modeldata[1] is number of vertex indices.
           var num_tris     = modeldata[1] / 3;
           var verts_offset = modeldata[2];
           var num_verts    = modeldata[3];
@@ -29,6 +42,8 @@ SceneLoader = new function () {
 
           var positions = new Float32Array(num_tris * 9);
 
+          // Explode vertices, as we want non-shared attributes for normals
+          // and for vertex numbering.
           for (var j = 0; j < num_tris; j++) {
             positions[9 * j + 0] = verts[3 * tris[3 * j + 0] + 0];
             positions[9 * j + 1] = verts[3 * tris[3 * j + 0] + 1];
@@ -53,7 +68,7 @@ SceneLoader = new function () {
           };
 
           model.computeVertexNormals();
-          onloadFunction(model, fileNumber);
+          onloadFunction(model);
         }
       }
     };
