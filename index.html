@@ -42,23 +42,23 @@
       Mouse &mdash; Look<br>
     </label>
     <hr>
-    <label><input id="normalShading" type="checkbox" onchange="interface.toggleNormalShading()"> Show normals</label><br>
-    <label><input id="edgeHighlight" type="checkbox" onchange="interface.toggleEdgeHighlighting()"> Highlight edges</label><br>
-    <label><input id="edgeAttenuation" type="checkbox" onchange="interface.toggleEdgeAttenuation()"> Attenuate edge highlighting with distance</label><br>
-    <label><input id="backfaceCulling" type="checkbox" onchange="interface.toggleBackfaceCulling()"> Cull backfaces</label><br>
-    <label><input id="wrapAround" type="checkbox" onchange="interface.toggleWrapAround()"> Wrap-around lighting</label><br>
+    <label><input id="normalShading" type="checkbox" onchange="iface.toggleNormalShading()"> Show normals</label><br>
+    <label><input id="edgeHighlight" type="checkbox" onchange="iface.toggleEdgeHighlighting()"> Highlight edges</label><br>
+    <label><input id="edgeAttenuation" type="checkbox" onchange="iface.toggleEdgeAttenuation()"> Attenuate edge highlighting with distance</label><br>
+    <label><input id="backfaceCulling" type="checkbox" onchange="iface.toggleBackfaceCulling()"> Cull backfaces</label><br>
+    <label><input id="wrapAround" type="checkbox" onchange="iface.toggleWrapAround()"> Wrap-around lighting</label><br>
 
-    <label><input type="color" value="#000000" onchange="interface.setEdgeColor(this.value)"> Edge color</label><br>
-    <label><input type="color" value="#ffffff" onchange="interface.setLightColor(this.value)"> Light color</label><br>
+    <label><input type="color" value="#000000" onchange="iface.setEdgeColor(this.value)"> Edge color</label><br>
+    <label><input type="color" value="#ffffff" onchange="iface.setLightColor(this.value)"> Light color</label><br>
 
-    <label>x: <input id="light-x" class="pos" onchange="interface.setLightPos(this.value, null, null)"></label>
-    <label>y: <input id="light-y" class="pos" onchange="interface.setLightPos(null, this.value, null)"></label>
-    <label>z: <input id="light-z" class="pos" onchange="interface.setLightPos(null, null, this.value)"></label>
+    <label>x: <input id="light-x" class="pos" onchange="iface.setLightPos(this.value, null, null)"></label>
+    <label>y: <input id="light-y" class="pos" onchange="iface.setLightPos(null, this.value, null)"></label>
+    <label>z: <input id="light-z" class="pos" onchange="iface.setLightPos(null, null, this.value)"></label>
     <label>Light position</label><br>
 
-    <button class="button tiny" onclick="interface.resetCamera()">Reset camera position</button>
+    <button class="button tiny" onclick="iface.resetCamera()">Reset camera position</button>
     <hr>
-    <select onchange="interface.swapGames(this.value)">
+    <select onchange="iface.swapGames(this.value)">
       <option value="ds1">Dark Souls 1</option>
       <option value="ds2">Dark Souls 2</option>
     </select><br>
@@ -69,7 +69,7 @@
 
   <script>
   var sidebar, canvas, renderer, clock, scene, camera, controls, material,
-      meshes, light, interface;
+      meshes, light, iface;
 
   /**
    * Create and set all global variables and controls
@@ -184,8 +184,8 @@
 
   // Run the program.
   init();
-  interface = new Interface(scene, camera, meshes, material, light, Config);
-  interface.setupInterface();
+  iface = new Interface(scene, camera, meshes, material, light, Config);
+  iface.setupInterface();
   render();
   </script>
 </body>
