@@ -1,8 +1,7 @@
 /**
  * Shader program that does edge detection and lambert shading, and accepts a
  * number of switches. Having everything together in one big shader with
- * switches is probably bad practice. Edge detection based on Florian Boesch's
- * code at {@link http://goo.gl/qKkDPr}.
+ * switches is probably bad practice.
  */
 BigShader = {
   attributes: {
@@ -10,10 +9,11 @@ BigShader = {
   },
 
   uniforms: {
-    "edgeColor":     { type: "v3", value: new THREE.Vector3(0, 0, 0) },
-    "edgeHighlight": { type: "f", value: 0.0 },
-    "wrapAround":    { type: "f", value: 1.0 },
-    "normalShading": { type: "f", value: 0.0 }
+    "edgeColor":       { type: "v3", value: new THREE.Vector3(0, 0, 0) },
+    "edgeHighlight":   { type: "f", value: 0.0 },
+    "edgeAttenuation": { type: "f", value: 1.0 },
+    "wrapAround":      { type: "f", value: 1.0 },
+    "normalShading":   { type: "f", value: 0.0 }
   },
 
   vertexShader: [
@@ -44,6 +44,7 @@ BigShader = {
 
     "uniform vec3 edgeColor;",
     "uniform float edgeHighlight;",
+    "uniform float edgeAttenuation;",
     "uniform float wrapAround;",
     "uniform float normalShading;",
 
@@ -104,7 +105,9 @@ BigShader = {
 
         // Highlight edges
         "if (edgeHighlight > 0.0) {",
-          "faceColor = mix(edgeColor, faceColor, edgeFactor());",
+          "float depthFactor = clamp(gl_FragCoord.z / gl_FragCoord.w * 0.003, 0.0, 1.0);",
+          "vec3 newEdgeColor = mix(edgeColor, faceColor, depthFactor * edgeAttenuation);",
+          "faceColor = mix(newEdgeColor, faceColor, edgeFactor());",
         "}",
 
         "gl_FragColor = vec4(faceColor, 1.0);",

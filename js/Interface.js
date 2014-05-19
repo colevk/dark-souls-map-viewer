@@ -58,6 +58,10 @@ function Interface(scene, camera, meshes, material, light, config) {
       $('#edgeHighlight').attr('checked', '');
     }
 
+    if (material.uniforms.edgeAttenuation.value) {
+      $('#edgeAttenuation').attr('checked', '');
+    }
+
     if (material.side === THREE.FrontSide) {
       $('#backfaceCulling').attr('checked', '');
     }
@@ -90,14 +94,24 @@ function Interface(scene, camera, meshes, material, light, config) {
    * Toggle displaying the surface normal in place of fragment color.
    */
   self.toggleNormalShading = function() {
-    material.uniforms.normalShading.value = !material.uniforms.normalShading.value;
+    material.uniforms.normalShading.value =
+      !material.uniforms.normalShading.value;
   }
 
   /**
    * Toggle displaying triangle edges.
    */
   self.toggleEdgeHighlighting = function() {
-    material.uniforms.edgeHighlight.value = !material.uniforms.edgeHighlight.value;
+    material.uniforms.edgeHighlight.value =
+      !material.uniforms.edgeHighlight.value;
+  }
+
+  /**
+   * Toggle attenuating edge highlighting with distance.
+   */
+  self.toggleEdgeAttenuation = function() {
+    material.uniforms.edgeAttenuation.value =
+      !material.uniforms.edgeAttenuation.value;
   }
 
   /**
@@ -106,7 +120,8 @@ function Interface(scene, camera, meshes, material, light, config) {
    */
   self.setEdgeColor = function(color) {
     var tmpColor = new THREE.Color(color);
-    material.uniforms.edgeColor.value = new THREE.Vector3(tmpColor.r, tmpColor.g, tmpColor.b);
+    material.uniforms.edgeColor.value =
+      new THREE.Vector3(tmpColor.r, tmpColor.g, tmpColor.b);
   }
 
   /**
