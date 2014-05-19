@@ -5,10 +5,11 @@
  * @param {THREE.Camera} camera The camera.
  * @param {Array.<THREE.Mesh>} meshes All possible meshes to display.
  * @param {BigShaderMaterial} material The shader material.
+ * @param {THREE.DirectionalLight} light The scene's light source.
  * @param {Config} config Config data containing filenames and which files
  *   should be displayed.
  */
-function Interface(scene, camera, meshes, material, config) {
+function Interface(scene, camera, meshes, material, light, config) {
   var self = this;
 
   /**
@@ -39,10 +40,15 @@ function Interface(scene, camera, meshes, material, config) {
         var label = $('<label>');
         label.append(checkbox);
         label.append($('<span> ' + names[j] + '</span>'));
+        label.append($('<br>'));
 
         $('#' + game).append(label);
       }
     }
+
+    $('#light-x').val(light.position.x);
+    $('#light-y').val(light.position.y);
+    $('#light-z').val(light.position.z);
 
     if (material.uniforms.normalShading.value) {
       $('#normalShading').attr('checked', '');
@@ -158,5 +164,19 @@ function Interface(scene, camera, meshes, material, config) {
         }
       }
     }
+  }
+
+  /**
+   * Set the position of the scene light. If a null is provided, value is
+   *   unchanged.
+   * @param {number} x X position of the light. Can be null.
+   * @param {number} y Y position of the light. Can be null.
+   * @param {number} z Z position of the light. Can be null.
+   */
+  self.setLightPos = function(x, y, z) {
+    x = x || light.position.x;
+    y = y || light.position.y;
+    z = z || light.position.z;
+    light.position.set(x, y, z);
   }
 }

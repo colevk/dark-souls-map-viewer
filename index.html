@@ -12,6 +12,14 @@
   button {
     margin-bottom: 0rem !important;
   }
+  input.pos {
+    display: inline;
+    width: 2rem;
+    margin-bottom: 0.5rem !important;
+  }
+  label {
+    display: inline;
+  }
   </style>
 
   <script src="js/lib/jquery-2.1.1.min.js"></script>
@@ -34,18 +42,25 @@
       Mouse &mdash; Look<br>
     </label>
     <hr>
-    <label><input id="normalShading" type="checkbox" onchange="interface.toggleNormalShading()"> Show normals</label>
-    <label><input id="edgeHighlight" type="checkbox" onchange="interface.toggleEdgeHighlighting()"> Highlight edges</label>
-    <label><input id="backfaceCulling" type="checkbox" onchange="interface.toggleBackfaceCulling()"> Cull backfaces</label>
-    <label><input id="wrapAround" type="checkbox" onchange="interface.toggleWrapAround()"> Wrap-around lighting</label>
-    <label><input type="color" value="#000000" onchange="interface.setEdgeColor(this.value)"> Edge color</label>
-    <label><input type="color" value="#ffffff" onchange="interface.setLightColor(this.value)"> Light color</label>
+    <label><input id="normalShading" type="checkbox" onchange="interface.toggleNormalShading()"> Show normals</label><br>
+    <label><input id="edgeHighlight" type="checkbox" onchange="interface.toggleEdgeHighlighting()"> Highlight edges</label><br>
+    <label><input id="backfaceCulling" type="checkbox" onchange="interface.toggleBackfaceCulling()"> Cull backfaces</label><br>
+    <label><input id="wrapAround" type="checkbox" onchange="interface.toggleWrapAround()"> Wrap-around lighting</label><br>
+
+    <label><input type="color" value="#000000" onchange="interface.setEdgeColor(this.value)"> Edge color</label><br>
+    <label><input type="color" value="#ffffff" onchange="interface.setLightColor(this.value)"> Light color</label><br>
+
+    <label>x: <input id="light-x" class="pos" onchange="interface.setLightPos(this.value, null, null)"></label>
+    <label>y: <input id="light-y" class="pos" onchange="interface.setLightPos(null, this.value, null)"></label>
+    <label>z: <input id="light-z" class="pos" onchange="interface.setLightPos(null, null, this.value)"></label>
+    <label>Light position</label><br>
+
     <button class="button tiny" onclick="interface.resetCamera()">Reset camera position</button>
     <hr>
     <select onchange="interface.swapGames(this.value)">
       <option value="ds1">Dark Souls 1</option>
       <option value="ds2">Dark Souls 2</option>
-    </select>
+    </select><br>
     <div id="ds1" class="file-list"></div>
     <div id="ds2" class="file-list"></div>
   </div>
@@ -53,7 +68,7 @@
 
   <script>
   var sidebar, canvas, renderer, clock, scene, camera, controls, material,
-      meshes, interface;
+      meshes, light, interface;
 
   /**
    * Create and set all global variables and controls
@@ -119,7 +134,7 @@
 
     meshes = [];
 
-    // Load dark souls 1 files into meshes, annotated with their game and file
+    // Load Dark Souls 1 files into meshes, annotated with the game and file
     // that they are associated with.
     for (var i = 0, lenI = Config.ds1.length; i < lenI; i++) {
       (function(fileNumber) { // pass loop variable into scope
@@ -137,7 +152,7 @@
       })(i);
     }
 
-    // Load dark souls 2 files into meshes, annotated with their game and file
+    // Load Dark Souls 2 files into meshes, annotated with the game and file
     // that they are associated with.
     for (var i = 0, lenI = Config.ds2.length; i < lenI; i++) {
       (function(fileNumber) { // pass loop variable into scope
@@ -152,7 +167,8 @@
       })(i);
     }
 
-    scene.add(Config.light);
+    light = Config.light;
+    scene.add(light);
   }
 
   /**
@@ -167,7 +183,7 @@
 
   // Run the program.
   init();
-  interface = new Interface(scene, camera, meshes, material, Config);
+  interface = new Interface(scene, camera, meshes, material, light, Config);
   interface.setupInterface();
   render();
   </script>
