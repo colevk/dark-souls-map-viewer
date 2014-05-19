@@ -78,7 +78,7 @@
     sidebar = $('#sidebar');
     canvas = $('#canvas');
 
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(canvas.width(), canvas.height());
     canvas.append(renderer.domElement);
 
