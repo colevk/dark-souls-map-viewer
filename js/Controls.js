@@ -108,8 +108,9 @@ function BaseControls(object, domElement) {
 
   /**
    * Stub for subclass-specific adjustments.
+   * @param {number} delta The time since the last update.
    */
-  self.adjust = function() {}
+  self.adjust = function(delta) {}
 
   /**
    * Update the object's position and rotation based on the movement and
@@ -140,7 +141,7 @@ function BaseControls(object, domElement) {
     self.object.rotation.x = clamp(self.object.rotation.x, -PI_2, PI_2);
 
     // Perform any other adjustments
-    self.adjust();
+    self.adjust(delta);
   };
 
   // Bind handlers to events.
@@ -178,10 +179,11 @@ function PointerLockControls(object, domElement) {
 
   /**
    * Make view slow to a halt in absence of mouse movement.
+   * @param {number} delta The time since the last update.
    */
-  self.adjust = function() {
-    self.moveState.yawLeft *= 0.8;
-    self.moveState.pitchDown *= 0.8;
+  self.adjust = function(delta) {
+    self.moveState.yawLeft *= Math.pow(0.8, delta * 60);
+    self.moveState.pitchDown *= Math.pow(0.8, delta * 60);
     self.updateRotationVector();
   }
 
