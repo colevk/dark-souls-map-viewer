@@ -4,7 +4,7 @@ WebGL/three.js implementation of a map viewer for _Dark Souls_ and _Dark Souls 2
 
 ###Usage
 
-Run `server.py` and then go to [http://localhost:8000](http://localhost:8000) in any web browser. Chrome is recommended, but it has been tested on Chrome, Firefox, and Safari for OSX, and Chrome for Windows.
+Run either `launch` or `server.py` and then go to [http://localhost:8000](http://localhost:8000) in any web browser. They do the same thing, but `launch` can be run directly from the Finder if you're on Mac. Chrome is recommended, but it has been tested on Chrome, Firefox, and Safari for OSX, and Chrome for Windows.
 
 ###Details
 

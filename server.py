@@ -53,6 +53,10 @@ class GzipHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 if __name__ == '__main__':
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-    print "Type Ctrl-C to quit."
+    print "\nGo to http://localhost:8000 to view."
+    print "Type Ctrl-C to quit.\n"
 
-    SimpleHTTPServer.test(GzipHTTPRequestHandler, BaseHTTPServer.HTTPServer)
+    try:
+        SimpleHTTPServer.test(GzipHTTPRequestHandler, BaseHTTPServer.HTTPServer)
+    except KeyboardInterrupt:
+        print "\nExiting."
