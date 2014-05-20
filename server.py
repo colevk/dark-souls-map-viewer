@@ -1,11 +1,23 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import os
 
-import SimpleHTTPServer
-import BaseHTTPServer
+try:
+    # python 2
+    from SimpleHTTPServer import SimpleHTTPRequestHandler
+    from BaseHTTPServer import HTTPServer
+    import SimpleHTTPServer
+    test = SimpleHTTPServer.test
+except ImportError:
+    # python 3
+    from http.server import SimpleHTTPRequestHandler
+    from http.server import HTTPServer
+    import http.server
+    test = http.server.test
 
-class GzipHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+class GzipHTTPRequestHandler(SimpleHTTPRequestHandler):
     def send_head(self):
         """Common code for GET and HEAD commands.
 
@@ -53,10 +65,10 @@ class GzipHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 if __name__ == '__main__':
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-    print "\nGo to http://localhost:8000 to view."
-    print "Type Ctrl-C to quit.\n"
+    print("\nGo to http://localhost:8000 to view.")
+    print("Type Ctrl-C to quit.\n")
 
     try:
-        SimpleHTTPServer.test(GzipHTTPRequestHandler, BaseHTTPServer.HTTPServer)
+        test(GzipHTTPRequestHandler, HTTPServer)
     except KeyboardInterrupt:
-        print "\nExiting."
+        print("\nExiting.")
