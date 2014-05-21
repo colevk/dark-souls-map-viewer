@@ -9,7 +9,7 @@ BigShader = {
   },
 
   uniforms: {
-    "edgeColor":       { type: "v3", value: new THREE.Vector3(0, 0, 0) },
+    "edgeColor":       { type: "c", value: new THREE.Color(0x000000) },
     "edgeHighlight":   { type: "f", value: 0.0 },
     "edgeAttenuation": { type: "f", value: 1.0 },
     "wrapAround":      { type: "f", value: 1.0 },

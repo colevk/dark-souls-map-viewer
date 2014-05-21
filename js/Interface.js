@@ -50,6 +50,9 @@ function Interface(scene, camera, meshes, material, light, config) {
     $('#light-y').val(light.position.y);
     $('#light-z').val(light.position.z);
 
+    $('#edgeColor').val('#' + material.uniforms.edgeColor.value.getHexString());
+    $('#lightColor').val('#' + config.light.color.getHexString());
+
     if (material.uniforms.normalShading.value) {
       $('#normalShading').attr('checked', '');
     }
@@ -119,9 +122,7 @@ function Interface(scene, camera, meshes, material, light, config) {
    * @param {string} color A css color string.
    */
   self.setEdgeColor = function(color) {
-    var tmpColor = new THREE.Color(color);
-    material.uniforms.edgeColor.value =
-      new THREE.Vector3(tmpColor.r, tmpColor.g, tmpColor.b);
+    material.uniforms.edgeColor.value = new THREE.Color(color);
   }
 
   /**

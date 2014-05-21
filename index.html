@@ -48,8 +48,8 @@
     <label><input id="backfaceCulling" type="checkbox" onchange="iface.toggleBackfaceCulling()"> Cull backfaces</label><br>
     <label><input id="wrapAround" type="checkbox" onchange="iface.toggleWrapAround()"> Wrap-around lighting</label><br>
 
-    <label><input type="color" value="#000000" onchange="iface.setEdgeColor(this.value)"> Edge color</label><br>
-    <label><input type="color" value="#ffffff" onchange="iface.setLightColor(this.value)"> Light color</label><br>
+    <label><input id="edgeColor" type="color" onchange="iface.setEdgeColor(this.value)"> Edge color</label><br>
+    <label><input id="lightColor" type="color" onchange="iface.setLightColor(this.value)"> Light color</label><br>
 
     <label>x: <input id="light-x" class="pos" onchange="iface.setLightPos(this.value, null, null)"></label>
     <label>y: <input id="light-y" class="pos" onchange="iface.setLightPos(null, this.value, null)"></label>
