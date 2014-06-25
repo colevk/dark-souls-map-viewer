@@ -199,7 +199,7 @@ function PointerLockControls(object, domElement) {
  * @param {THREE.Object3D} object The object to be moved by the controls.
  * @param {Element} domElement The element where the controls should be active.
  */
-NoPointerLockControls = function(object, domElement) {
+function NoPointerLockControls(object, domElement) {
   var self = this;
 
   BaseControls.call(self, object, domElement);
