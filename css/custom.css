@@ -1,0 +1,14 @@
+  input {
+    margin-bottom: 0.2rem !important;
+  }
+  button {
+    margin-bottom: 0rem !important;
+  }
+  input.pos {
+    display: inline;
+    width: 2rem;
+    margin-bottom: 0.5rem !important;
+  }
+  label {
+    display: inline;
+  }

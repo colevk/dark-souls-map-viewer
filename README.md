@@ -3,22 +3,6 @@
 WebGL/three.js implementation of a map viewer for _Dark Souls_ and _Dark Souls
 2_, using the games' collision data.
 
-###Usage
-
-Run either `launch-mac` or `launch-win` (depending on platform) and then go to
-[http://localhost:8000](http://localhost:8000) in any web browser. `launch-win`
-was created with `py2exe`. Alternatively, run `python server.py`.
-
-Chrome is recommended, but it has been tested on Chrome, Firefox, and Safari
-for OSX, and Chrome for Windows.
-
-###Caveats
-
-Doesn't work in Internet Explorer. Only Chrome and Firefox support pointer lock
-controls, so in other browsers it's slighly awkward to move the camera. Some
-browsers or computers might not support WebGL antialiasing, in which case
-everything will look horribly jagged.
-
 ###Details
 
 Inspired by Vlad001's
