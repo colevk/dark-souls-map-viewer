@@ -16,7 +16,7 @@ function init() {
   scene = new THREE.Scene();
   material = BigShaderMaterial;
 
-  camera = new THREE.PerspectiveCamera( 75, canvas.width() / canvas.height(), 0.1, 10000 );
+  camera = new THREE.PerspectiveCamera(75, canvas.width() / canvas.height(), 0.1, 10000);
 
   // Reset aspect ratio when window is resized
   $(window).resize(function() {
@@ -60,7 +60,7 @@ function init() {
     controls = new NoPointerLockControls(camera, renderer.domElement);
   }
 
-  camera.position = Config.defaultCameraPosition();
+  camera.position.copy(Config.defaultCameraPosition());
   camera.lookAt(Config.defaultCameraLookAt());
 
   meshes = [];
@@ -113,7 +113,7 @@ function render() {
 };
 
 /**
- * Determine if browser supports WebGL.
+ * Determine if browser/graphics card supports WebGL.
  */
 function hasWebGL() {
   try {

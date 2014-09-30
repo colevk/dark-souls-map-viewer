@@ -3,9 +3,14 @@
   "name": "Dark Souls Map Viewer",
   "version": "1.0.0",
 
+  "permissions": [
+    "system.display",
+    "pointerLock"
+  ],
   "app": {
-    "launch": {
-      "local_path": "index.html"
+    "background": {
+      "scripts": ["launch.js"],
+      "persistent": false
     }
   }
 }

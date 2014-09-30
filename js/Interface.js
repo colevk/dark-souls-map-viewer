@@ -137,7 +137,7 @@ function Interface(scene, camera, meshes, material, light, config) {
    * Reset camera to its default position and orientation.
    */
   self.resetCamera = function() {
-    camera.position = Config.defaultCameraPosition();
+    camera.position.copy(Config.defaultCameraPosition());
     camera.lookAt(Config.defaultCameraLookAt());
   }
 
