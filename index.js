@@ -8,7 +8,7 @@ function init() {
   sidebar = $('#sidebar');
   canvas = $('#canvas');
 
-  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer = new THREE.WebGLRenderer({antialias: true});
   renderer.setSize(canvas.width(), canvas.height());
   canvas.append(renderer.domElement);
 
@@ -36,25 +36,34 @@ function init() {
     var element = canvas.get()[0];
 
     // Enable controls only when pointer is locked.
-			var pointerlockchange = function() {
-				if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
-					controls.enabled = true;
-				} else {
-					controls.enabled = false;
-				}
-			}
+      var pointerlockchange = function() {
+        controls.enabled = (document.pointerLockElement === element ||
+                            document.mozPointerLockElement === element ||
+                            document.webkitPointerLockElement === element)
+      }
 
-			// Hook pointer lock state change events
-			document.addEventListener('pointerlockchange', pointerlockchange, false);
-			document.addEventListener('mozpointerlockchange', pointerlockchange, false);
-			document.addEventListener('webkitpointerlockchange', pointerlockchange, false);
+      // Hook pointer lock state change events
+      document.addEventListener('pointerlockchange', pointerlockchange, false);
+      document.addEventListener('mozpointerlockchange', pointerlockchange, false);
+      document.addEventListener('webkitpointerlockchange', pointerlockchange, false);
 
-			canvas.click(function() {
-				element.requestPointerLock = element.requestPointerLock ||
-                                   element.mozRequestPointerLock ||
-                                   element.webkitRequestPointerLock;
-				element.requestPointerLock();
-			});
+      canvas.click(function() {
+        element.requestPointerLock = element.requestPointerLock ||
+                                     element.mozRequestPointerLock ||
+                                     element.webkitRequestPointerLock;
+        element.requestPointerLock();
+      });
+
+      document.exitPointerLock = document.exitPointerLock ||
+                                 document.mozExitPointerLock ||
+                                 document.webkitExitPointerLock;
+
+      // Pointer lock exit must be manual in Chrome Apps
+      $(document).keyup(function(e) {
+        if (e.which == 27) {
+          document.exitPointerLock();
+        }
+      })
   } else {
     // Use backup controls
     controls = new NoPointerLockControls(camera, renderer.domElement);

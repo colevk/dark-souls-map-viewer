@@ -59,8 +59,8 @@ function BaseControls(object, domElement) {
       case 65: /*A*/ self.moveState.left = 1; break;
       case 68: /*D*/ self.moveState.right = 1; break;
 
-      case 82: /*R*/ self.moveState.up = 1; break;
-      case 70: /*F*/ self.moveState.down = 1; break;
+      case 81: /*Q*/ self.moveState.up = 1; break;
+      case 69: /*E*/ self.moveState.down = 1; break;
     }
 
     self.updateMovementVector();
@@ -71,7 +71,7 @@ function BaseControls(object, domElement) {
    * @param {object} event the keyup event.
    */
   self.keyup = function(event) {
-		if (self.enabled === false) return;
+    if (self.enabled === false) return;
 
     switch(event.keyCode) {
       case 16: /* shift */ self.movementSpeedMultiplier = 1; break;
@@ -82,8 +82,8 @@ function BaseControls(object, domElement) {
       case 65: /*A*/ self.moveState.left = 0; break;
       case 68: /*D*/ self.moveState.right = 0; break;
 
-      case 82: /*R*/ self.moveState.up = 0; break;
-      case 70: /*F*/ self.moveState.down = 0; break;
+      case 81: /*Q*/ self.moveState.up = 0; break;
+      case 69: /*E*/ self.moveState.down = 0; break;
     }
 
     self.updateMovementVector();
@@ -166,16 +166,16 @@ function PointerLockControls(object, domElement) {
    * @param {object} event The mousemove event.
    */
   self.mousemove = function(event) {
-		if (self.enabled === false) return;
+    if (self.enabled === false) return;
 
-		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+    var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+    var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-		self.moveState.yawLeft = - movementX * 0.07;
-		self.moveState.pitchDown = movementY * 0.07;
+    self.moveState.yawLeft = - movementX * 0.07;
+    self.moveState.pitchDown = movementY * 0.07;
 
     self.updateRotationVector();
-	};
+  };
 
   /**
    * Make view slow to a halt in absence of mouse movement.
