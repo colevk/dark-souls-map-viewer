@@ -59,8 +59,8 @@ function BaseControls(object, domElement) {
       case 65: /*A*/ self.moveState.left = 1; break;
       case 68: /*D*/ self.moveState.right = 1; break;
 
-      case 81: /*Q*/ self.moveState.up = 1; break;
-      case 69: /*E*/ self.moveState.down = 1; break;
+      case 69: /*E*/ self.moveState.up = 1; break;
+      case 81: /*Q*/ self.moveState.down = 1; break;
     }
 
     self.updateMovementVector();
@@ -82,8 +82,8 @@ function BaseControls(object, domElement) {
       case 65: /*A*/ self.moveState.left = 0; break;
       case 68: /*D*/ self.moveState.right = 0; break;
 
-      case 81: /*Q*/ self.moveState.up = 0; break;
-      case 69: /*E*/ self.moveState.down = 0; break;
+      case 69: /*E*/ self.moveState.up = 0; break;
+      case 81: /*Q*/ self.moveState.down = 0; break;
     }
 
     self.updateMovementVector();

@@ -1,7 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Dark Souls Map Viewer",
-  "version": "1.0.0",
+  "description": "Explore the environments of the Dark Souls series.",
+  "version": "1.0.1",
 
   "permissions": [
     "system.display",

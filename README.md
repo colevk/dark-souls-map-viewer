@@ -20,6 +20,8 @@ guide](http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-baryc
 al](http://webstaff.itn.liu.se/~andyn/courses/tncg08/sketches06/sketches/0505-ba
  erentzen.pdf).
 
+The font used in the icons is Optimus Princeps Semi Bold.
+
 ###License
 
 This content is released under the MIT License.
