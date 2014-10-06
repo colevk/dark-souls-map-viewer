@@ -10,10 +10,10 @@ BigShader = {
 
   uniforms: {
     "edgeColor":       { type: "c", value: new THREE.Color(0x000000) },
-    "edgeHighlight":   { type: "f", value: 0.0 },
-    "edgeAttenuation": { type: "f", value: 1.0 },
-    "wrapAround":      { type: "f", value: 1.0 },
-    "normalShading":   { type: "f", value: 0.0 }
+    "edgeHighlight":   { type: "i", value: 0 },
+    "edgeAttenuation": { type: "i", value: 1 },
+    "wrapAround":      { type: "i", value: 1 },
+    "normalShading":   { type: "i", value: 0 }
   },
 
   vertexShader: [
@@ -43,10 +43,10 @@ BigShader = {
     "#extension GL_OES_standard_derivatives : enable",
 
     "uniform vec3 edgeColor;",
-    "uniform float edgeHighlight;",
-    "uniform float edgeAttenuation;",
-    "uniform float wrapAround;",
-    "uniform float normalShading;",
+    "uniform int edgeHighlight;",
+    "uniform int edgeAttenuation;",
+    "uniform int wrapAround;",
+    "uniform int normalShading;",
 
     "uniform vec3 ambientLightColor;",
 
@@ -85,7 +85,7 @@ BigShader = {
 
             // With wrapAround, light intensity drops to 0 only directly
             // opposite the light, rather than perpendicular and beyond.
-            "if (wrapAround > 0.0) {",
+            "if (wrapAround > 0) {",
               "intensity = 0.5 + 0.5 * intensity;",
             "}",
             "intensity = clamp(intensity, 0.0, 1.0);",
@@ -95,8 +95,8 @@ BigShader = {
         "#endif",
 
         // Show surface normal in place of computed color.
-        "if (normalShading > 0.0) {",
-          "if (wrapAround > 0.0) {",
+        "if (normalShading > 0) {",
+          "if (wrapAround > 0) {",
             "faceColor = vec3(0.5) + 0.5 * normal;",
           "} else {",
             "faceColor = normal;",
@@ -104,9 +104,9 @@ BigShader = {
         "}",
 
         // Highlight edges
-        "if (edgeHighlight > 0.0) {",
+        "if (edgeHighlight > 0) {",
           "float depthFactor = clamp(gl_FragCoord.z / gl_FragCoord.w * 0.003, 0.0, 1.0);",
-          "vec3 newEdgeColor = mix(edgeColor, faceColor, depthFactor * edgeAttenuation);",
+          "vec3 newEdgeColor = mix(edgeColor, faceColor, depthFactor * float(edgeAttenuation));",
           "faceColor = mix(newEdgeColor, faceColor, edgeFactor());",
         "}",
 
