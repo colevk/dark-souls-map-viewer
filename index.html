@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8"/>
   <title>Dark Souls Map Viewer</title>
   <link href="css/reset.css" rel="stylesheet" type="text/css">
   <link href="css/foundation.min.css" rel="stylesheet" type="text/css">
@@ -9,6 +9,7 @@
 
   <script src="js/lib/jquery-2.1.1.min.js"></script>
   <script src="js/lib/three.min.js"></script>
+  <script src="js/lib/ResizeSensor.js"></script>
 
   <script src="js/BigShader.js"></script>
   <script src="js/Interface.js"></script>
@@ -19,28 +20,28 @@
 </head>
 
 <body style="overflow:hidden;">
-  <div id="sidebar" class="panel" style="height: 100vh; width: 25rem; float: right; overflow: auto">
+  <div id="sidebar" class="panel">
     <h4>Dark Souls Map Viewer</h4>
     <hr>
-    <label>
+    <p>
       W, A, S, D, Q, E &mdash; Move<br>
       Shift &mdash; Speed up<br>
       Mouse &mdash; Look<br>
-    </label>
+      Esc &mdash; Free mouse<br>
+    </p>
     <hr>
-    <label><input id="normalShading" type="checkbox"> Show normals</label><br>
-    <label><input id="edgeHighlight" type="checkbox"> Highlight edges</label><br>
-    <label><input id="edgeAttenuation" type="checkbox"> Attenuate edge highlighting with distance</label><br>
-    <label><input id="backfaceCulling" type="checkbox"> Cull backfaces</label><br>
-    <label><input id="wrapAround" type="checkbox"> Wrap-around lighting</label><br>
+    <label><input id="normalShading" type="checkbox"><span> Show normals</span></label>
+    <label><input id="edgeHighlight" type="checkbox"><span> Highlight edges</span></label>
+    <label><input id="edgeAttenuation" type="checkbox"><span> Attenuate edge highlighting with distance</span></label>
+    <label><input id="backfaceCulling" type="checkbox"><span> Cull backfaces</span></label>
+    <label><input id="wrapAround" type="checkbox"><span> Wrap-around lighting</span></label>
 
-    <label><input id="edgeColor" type="color"> Edge color</label><br>
-    <label><input id="lightColor" type="color"> Light color</label><br>
+    <label><input id="edgeColor" type="color"><span> Edge color</span></label>
+    <label><input id="lightColor" type="color"><span> Light color</span></label>
 
-    <label>x: <input id="light-x" class="pos"></label>
-    <label>y: <input id="light-y" class="pos"></label>
-    <label>z: <input id="light-z" class="pos"></label>
-    <label>Light direction</label><br>
+    <label class="inline">x: <input id="light-x" class="pos"></label>
+    <label class="inline">y: <input id="light-y" class="pos"></label>
+    <label class="inline">z: <input id="light-z" class="pos"><span> Light direction</span></label><br><br>
 
     <button id="resetCamera" class="button tiny">Reset camera position</button>
     <hr>
@@ -51,7 +52,6 @@
     <div id="ds1" class="file-list"></div>
     <div id="ds2" class="file-list"></div>
   </div>
-  <div id="canvas" style="height: 100%; margin-right: 25rem;"></div>
-
+  <div id="canvas"></div>
 </body>
 </html>

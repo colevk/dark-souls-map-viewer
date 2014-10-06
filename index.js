@@ -143,7 +143,7 @@ $(document).ready(function() {
     render();
   } else {
     // Provide error message
-    var element = document.createElement( 'div' );
+    var element = document.createElement('div');
     element.style.textAlign = 'center';
     element.style.padding = '1.5em';
     element.style['padding-top'] = '6.5em';
@@ -156,6 +156,13 @@ $(document).ready(function() {
 
     canvas.appendChild(element);
   }
+
+  new ResizeSensor($('#sidebar'), function() {
+    canvas.css('margin-left', sidebar.css('width'));
+    renderer.setSize(canvas.width(), canvas.height());
+    camera.aspect = canvas.width() / canvas.height();
+    camera.updateProjectionMatrix();
+  });
 
   $('#normalShading').change(iface.toggleNormalShading);
   $('#edgeHighlight').change(iface.toggleEdgeHighlighting);
