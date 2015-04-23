@@ -1,10 +1,10 @@
 /**
- * Sets up common elements between pointerlock and non-pointerlock controls.
+ * Controls for browsers that support pointer lock. View moves with mouse.
  * @constructor
  * @param {THREE.Object3D} object The object to be moved by the controls.
  * @param {Element} domElement The element where the controls should be active.
  */
-function BaseControls(object, domElement) {
+function Controls(object, domElement) {
   var self = this;
 
   self.enabled = false;
@@ -90,6 +90,22 @@ function BaseControls(object, domElement) {
   };
 
   /**
+   * Handle the movemouse event by rotating the view directly.
+   * @param {object} event The mousemove event.
+   */
+  self.mousemove = function(event) {
+    if (self.enabled === false) return;
+
+    var movementX = event.movementX || 0;
+    var movementY = event.movementY || 0;
+
+    self.moveState.yawLeft = -movementX * 0.07;
+    self.moveState.pitchDown = movementY * 0.07;
+
+    self.updateRotationVector();
+  };
+
+  /**
    * Updates the movement vector based on the current move state.
    */
   self.updateMovementVector = function() {
@@ -107,10 +123,14 @@ function BaseControls(object, domElement) {
   };
 
   /**
-   * Stub for subclass-specific adjustments.
+   * Make view slow to a halt in absence of mouse movement.
    * @param {number} delta The time since the last update.
    */
-  self.adjust = function(delta) {}
+  self.adjust = function(delta) {
+    self.moveState.yawLeft *= Math.pow(0.8, delta * 60);
+    self.moveState.pitchDown *= Math.pow(0.8, delta * 60);
+    self.updateRotationVector();
+  }
 
   /**
    * Update the object's position and rotation based on the movement and
@@ -145,140 +165,8 @@ function BaseControls(object, domElement) {
   };
 
   // Bind handlers to events.
+  window.addEventListener('mousemove', self.mousemove, false);
   window.addEventListener('keydown', self.keydown, false);
   window.addEventListener('keyup', self.keyup, false);
 
-};
-
-/**
- * Controls for browsers that support pointer lock. View moves with mouse.
- * @constructor
- * @param {THREE.Object3D} object The object to be moved by the controls.
- * @param {Element} domElement The element where the controls should be active.
- */
-function PointerLockControls(object, domElement) {
-  var self = this;
-
-  BaseControls.call(self, object, domElement)
-
-  /**
-   * Handle the movemouse event by rotating the view directly.
-   * @param {object} event The mousemove event.
-   */
-  self.mousemove = function(event) {
-    if (self.enabled === false) return;
-
-    var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-    var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-
-    self.moveState.yawLeft = - movementX * 0.07;
-    self.moveState.pitchDown = movementY * 0.07;
-
-    self.updateRotationVector();
-  };
-
-  /**
-   * Make view slow to a halt in absence of mouse movement.
-   * @param {number} delta The time since the last update.
-   */
-  self.adjust = function(delta) {
-    self.moveState.yawLeft *= Math.pow(0.8, delta * 60);
-    self.moveState.pitchDown *= Math.pow(0.8, delta * 60);
-    self.updateRotationVector();
-  }
-
-  // Bind handlers to events.
-  window.addEventListener('mousemove', self.mousemove, false);
-};
-
-/**
- * Controls for browsers that don't support pointer lock. When mouse is clicked,
- *   view moves with speed proportional to distance from the center of the
- *   element
- * @constructor
- * @param {THREE.Object3D} object The object to be moved by the controls.
- * @param {Element} domElement The element where the controls should be active.
- */
-function NoPointerLockControls(object, domElement) {
-  var self = this;
-
-  BaseControls.call(self, object, domElement);
-
-  // Key events should always fire.
-  self.enabled = true;
-
-  // Mouse move events should only fire when mouse is down.
-  self.mouseEnabled = false;
-
-  /**
-   * Handle the mouse down event by enabling drag controls.
-   * @param {object} event The mousedown event.
-   */
-  self.mousedown = function(event) {
-    if (self.domElement !== document) {
-      self.domElement.focus();
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    self.mouseStatus = true;
-  };
-
-  /**
-   * Handle the mouse move event if the mouse is down, by rotating proportional
-   *   to the distance from the center of domElement.
-   * @param {object} event The mousemove event.
-   */
-  self.mousemove = function(event) {
-    if (self.mouseStatus) {
-      var container = self.getContainerDimensions();
-      var halfWidth = container.size[0] / 2;
-      var halfHeight = container.size[1] / 2;
-
-      self.moveState.yawLeft = -((event.pageX - container.offset[0]) - halfWidth) / halfWidth;
-      self.moveState.pitchDown = ((event.pageY - container.offset[1]) - halfHeight) / halfHeight;
-
-      self.updateRotationVector();
-    }
-  };
-
-  /**
-   * Handle the mouse up event by disabling drag controls and resetting the
-   *   rotation state and vector.
-   * @param {object} event The mouseup event.
-   */
-  self.mouseup = function(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    self.mouseStatus = false;
-
-    self.moveState.yawLeft = self.moveState.pitchDown = 0;
-
-    self.updateRotationVector();
-  };
-
-  /**
-   * Get the dimensions of the domElement container so that we know where the
-   *   center is.
-   */
-  self.getContainerDimensions = function() {
-    if (self.domElement != document) {
-      return {
-        size: [self.domElement.offsetWidth, self.domElement.offsetHeight],
-        offset: [self.domElement.offsetLeft, self.domElement.offsetTop]
-      };
-    } else {
-      return {
-        size: [window.innerWidth, window.innerHeight],
-        offset: [0, 0]
-      };
-    }
-  };
-
-  // Bind handlers to events.
-  self.domElement.addEventListener('mousemove', self.mousemove, false);
-  self.domElement.addEventListener('mousedown', self.mousedown, false);
-  self.domElement.addEventListener('mouseup', self.mouseup, false);
 };

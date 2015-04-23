@@ -2,12 +2,13 @@
   "manifest_version": 2,
   "name": "Dark Souls Map Viewer",
   "description": "Explore the environments of the Dark Souls series.",
-  "version": "1.0.2",
+  "version": "1.0.3",
 
   "permissions": [
     "system.display",
     "pointerLock"
   ],
+  "minimum_chrome_version": "41",
   "requirements": {
     "3D": {
       "features": ["webgl"]

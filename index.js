@@ -25,49 +25,28 @@ function init() {
     camera.updateProjectionMatrix();
   })
 
-  var havePointerLock = 'pointerLockElement' in document ||
-                        'mozPointerLockElement' in document ||
-                        'webkitPointerLockElement' in document;
+  controls = new Controls(camera, renderer.domElement);
 
-  // Only use pointer lock controls if browser supports them
-  if (havePointerLock) {
-    controls = new PointerLockControls(camera, renderer.domElement);
+  var element = canvas.get()[0];
 
-    var element = canvas.get()[0];
-
-    // Enable controls only when pointer is locked.
-      var pointerlockchange = function() {
-        controls.enabled = (document.pointerLockElement === element ||
-                            document.mozPointerLockElement === element ||
-                            document.webkitPointerLockElement === element)
-      }
-
-      // Hook pointer lock state change events
-      document.addEventListener('pointerlockchange', pointerlockchange, false);
-      document.addEventListener('mozpointerlockchange', pointerlockchange, false);
-      document.addEventListener('webkitpointerlockchange', pointerlockchange, false);
-
-      canvas.click(function() {
-        element.requestPointerLock = element.requestPointerLock ||
-                                     element.mozRequestPointerLock ||
-                                     element.webkitRequestPointerLock;
-        element.requestPointerLock();
-      });
-
-      document.exitPointerLock = document.exitPointerLock ||
-                                 document.mozExitPointerLock ||
-                                 document.webkitExitPointerLock;
-
-      // Pointer lock exit must be manual in Chrome Apps
-      $(document).keyup(function(e) {
-        if (e.which == 27) {
-          document.exitPointerLock();
-        }
-      })
-  } else {
-    // Use backup controls
-    controls = new NoPointerLockControls(camera, renderer.domElement);
+  // Enable controls only when pointer is locked.
+  var pointerlockchange = function() {
+    controls.enabled = (document.pointerLockElement === element)
   }
+
+  // Hook pointer lock state change events
+  document.addEventListener('pointerlockchange', pointerlockchange, false);
+
+  canvas.click(function() {
+    element.requestPointerLock();
+  });
+
+  // Pointer lock exit must be manual in Chrome Apps
+  $(document).keyup(function(e) {
+    if (e.which == 27) {
+      document.exitPointerLock();
+    }
+  })
 
   camera.position.copy(Config.defaultCameraPosition());
   camera.lookAt(Config.defaultCameraLookAt());
@@ -85,10 +64,10 @@ function init() {
         meshes.push(mesh);
 
         // Make default files visible.
-        if (Config.ds1State[fileNumber]) { scene.add(mesh); }
+        if (Config.ds1[fileNumber].visible) { scene.add(mesh); }
       };
 
-      SceneLoader.loadIVFile('data/ds1/' + Config.ds1[i] + '.iv', loadFunc);
+      SceneLoader.loadIVFile('data/ds1/' + Config.ds1[i].name + '.iv', loadFunc);
     })(i);
   }
 
@@ -103,7 +82,7 @@ function init() {
         meshes.push(mesh);
       };
 
-      SceneLoader.loadIVFile('data/ds2/' + Config.ds2[i] + '.iv', loadFunc);
+      SceneLoader.loadIVFile('data/ds2/' + Config.ds2[i].name + '.iv', loadFunc);
     })(i);
   }
 

@@ -19,15 +19,14 @@ function Interface(scene, camera, meshes, material, light, config) {
     $('#ds2').toggle();
 
     for (var i = 0; i < 2; i++) {
-      var names = [config.ds1, config.ds2][i];
-      var state = [config.ds1State, config.ds2State][i];
+      var info = [config.ds1, config.ds2][i];
       var game = ['ds1', 'ds2'][i];
 
-      for (var j = 0, lenJ = names.length; j < lenJ; j++) {
+      for (var j = 0, lenJ = info.length; j < lenJ; j++) {
         var checkbox = $('<input type="checkbox">');
         checkbox.attr('name', game);
         checkbox.attr('value', j);
-        if (state[j]) {
+        if (info[j].visible) {
           checkbox.attr('checked', '');
         }
 
@@ -39,7 +38,7 @@ function Interface(scene, camera, meshes, material, light, config) {
 
         var label = $('<label>');
         label.append(checkbox);
-        label.append($('<span> ' + names[j] + '</span>'));
+        label.append($('<span> ' + info[j].name + '</span>'));
         label.append($('<br>'));
 
         $('#' + game).append(label);
