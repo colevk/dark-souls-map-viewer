@@ -20,15 +20,43 @@ Config = new function () {
       using: [{
         filename: "data/ds1/New Londo Ruins + Valley of Drakes.iv",
         // cut out the abyss because it interferes with Demon Ruins
-        // (it's just a big circle)
         chunks: [0, 1, 2, 2, 3],
         tris: [null, null, [0, 10025], [10067, null], null]
       }]
     },
-    {visible: false, name: "Oolacile"},
+    {
+      visible: false,
+      name: "Oolacile",
+      using: [{
+        filename: "data/ds1/Oolacile.iv",
+        // Don't include pvp arenas or the boxes used to block off elevators
+        chunks: [0, 1, 2, 3, 4, 4, 5, 6, 6],
+        tris: [[16022, null], null, null, null, [0, 13063], [18154, 51484],
+               [8112, 21384], [3001, 27070], [27310, 29161]]
+      }]
+    },
+    {
+      visible: false,
+      name: "Oolacile Arenas",
+      using: [{
+        filename: "data/ds1/Oolacile.iv",
+        chunks: [0, 4, 4, 5, 5, 6],
+        tris: [[0, 16022], [13063, 18154], [51484, null], [0, 8112],
+               [21384, null], [0, 3001]]
+      }]
+    },
     {visible: false, name: "Painted World of Ariamis"},
     {visible: true, name: "Sen's Fortress"},
-    {visible: false, name: "Tomb of the Giants"},
+    {
+      visible: false,
+      name: "Tomb of the Giants",
+      using: [{
+        filename: "data/ds1/Tomb of the Giants.iv",
+        // Remove invisible (in-game) pillars blocking view
+        chunks: [0, 1],
+        tris: [null, [0, 26393]]
+      }]
+    },
     {visible: false, name: "Undead Asylum"},
     {visible: true, name: "Undead Burg"},
   ];
@@ -43,23 +71,23 @@ Config = new function () {
     {visible: false, name: "Aldia's Keep"},
     {
       visible: false,
-      name: "Arenas (Blue Sentinels)",
+      name: "Blue Sentinel Arenas",
       using: [{
         filename: "data/ds2/Heide's Tower of Flame + Cathedral of Blue.iv",
         chunks: [5, 6, 7, 8, 9],
         tris: [null, null, null, null, [0, 17343]]
       }]
     },
+    {visible: false, name: "Brightstone Cove Tseldora + Lord's Private Chamber"},
     {
       visible: false,
-      name: "Arenas (Brotherhood of Blood)",
+      name: "Brotherhood of Blood Arenas",
       using: [{
         filename: "data/ds2/Huntsman's Copse + Undead Purgatory.iv",
         chunks: [4, 5, 6],
         tris: [null, null, [0, 25786]]
       }]
     },
-    {visible: false, name: "Brightstone Cove Tseldora + Lord's Private Chamber"},
     {visible: false, name: "Dark Chasm of Old"},
     {visible: false, name: "Doors of Pharros"},
     {visible: false, name: "Dragon Aerie + Dragon Shrine"},
