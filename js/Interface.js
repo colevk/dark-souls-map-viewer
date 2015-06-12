@@ -4,7 +4,7 @@
  * @param {THREE.Scene} scene The scene to render.
  * @param {THREE.Camera} camera The camera.
  * @param {Array.<THREE.Mesh>} meshes All possible meshes to display.
- * @param {BigShaderMaterial} material The shader material.
+ * @param {ShaderMaterial} material The shader material.
  * @param {THREE.DirectionalLight} light The scene's light source.
  * @param {Config} config Config data containing filenames and which files
  *   should be displayed.

@@ -4,10 +4,6 @@
  * switches is probably bad practice.
  */
 BigShader = {
-  attributes: {
-    "vertexNumber": { type: 'f' }
-  },
-
   uniforms: {
     "edgeColor":       { type: "c", value: new THREE.Color(0x000000) },
     "edgeHighlight":   { type: "i", value: 0 },
@@ -23,7 +19,7 @@ BigShader = {
     "varying vec3 vBC;\n" +
 
     "void main() {\n" +
-    "  vNormal = normal;\n" +
+    "  vNormal = normalMatrix * normal;\n" +
     "  vBC = vec3(0.0);\n" +
 
     "  // Convert vertex number to barycentric coordinates\n" +
@@ -40,8 +36,6 @@ BigShader = {
   ,
 
   fragmentShader:
-    "#extension GL_OES_standard_derivatives : enable\n" +
-
     "uniform vec3 edgeColor;\n" +
     "uniform int edgeHighlight;\n" +
     "uniform int edgeAttenuation;\n" +
@@ -106,18 +100,3 @@ BigShader = {
     "  gl_FragColor = vec4(faceColor, 1.0);\n" +
     "}\n"
 };
-
-/**
- * Compiles the shader into a THREE.Material for use in meshes.
- */
-BigShaderMaterial = new THREE.ShaderMaterial({
-  side: THREE.DoubleSide,
-  lights: true,
-  attributes: BigShader.attributes,
-  uniforms: THREE.UniformsUtils.merge([
-    THREE.UniformsLib.lights,
-    BigShader.uniforms,
-  ]),
-  vertexShader: BigShader.vertexShader,
-  fragmentShader: BigShader.fragmentShader
-});

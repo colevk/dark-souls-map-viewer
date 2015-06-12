@@ -9,17 +9,29 @@ function init() {
   canvas = $('#canvas');
 
   renderer = new THREE.WebGLRenderer({antialias: true});
+  renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(canvas.width(), canvas.height());
   canvas.append(renderer.domElement);
 
   clock = new THREE.Clock();
   scene = new THREE.Scene();
-  material = BigShaderMaterial;
+  material = new THREE.ShaderMaterial({
+    side: THREE.DoubleSide,
+    derivatives: true,
+    lights: true,
+    uniforms: THREE.UniformsUtils.merge([
+      THREE.UniformsLib.lights,
+      BigShader.uniforms,
+    ]),
+    vertexShader: BigShader.vertexShader,
+    fragmentShader: BigShader.fragmentShader
+  });
 
   camera = new THREE.PerspectiveCamera(75, canvas.width() / canvas.height(), 0.1, 10000);
 
   // Reset aspect ratio when window is resized
   $(window).resize(function() {
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(canvas.width(), canvas.height());
     camera.aspect = canvas.width() / canvas.height();
     camera.updateProjectionMatrix();
@@ -79,7 +91,7 @@ function init() {
   for (var i = 0, lenI = Config.ds1.length; i < lenI; i++) {
     (function(fileNumber) { // pass loop variable into scope
       function loadFunc(bufferGeometry) {
-        var mesh = new THREE.Mesh(bufferGeometry, BigShaderMaterial);
+        var mesh = new THREE.Mesh(bufferGeometry, material);
         mesh.game = 'ds1';
         mesh.fileNumber = fileNumber;
         meshes.push(mesh);
@@ -99,7 +111,7 @@ function init() {
   for (var i = 0, lenI = Config.ds2.length; i < lenI; i++) {
     (function(fileNumber) { // pass loop variable into scope
       function loadFunc(bufferGeometry) {
-        var mesh = new THREE.Mesh(bufferGeometry, BigShaderMaterial);
+        var mesh = new THREE.Mesh(bufferGeometry, material);
         mesh.game = 'ds2';
         mesh.fileNumber = fileNumber;
         meshes.push(mesh);
@@ -154,4 +166,3 @@ $(document).ready(function() {
   $('#resetCamera').click(iface.resetCamera);
   $('#swapGames').change(function() { iface.swapGames(this.value); });
 });
-

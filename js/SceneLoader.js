@@ -79,16 +79,8 @@ SceneLoader = new function() {
             positions[9 * (j - start) + 8] = verts[3 * tris[3 * j + 2] + 2];
           }
 
-          model.attributes = {
-            position: {
-              itemSize: 3,
-              array: positions
-            },
-            vertexNumber: {
-              itemSize: 1,
-              array: vertexNumber
-            }
-          };
+          model.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+          model.addAttribute('vertexNumber', new THREE.BufferAttribute(vertexNumber, 1));
 
           model.computeVertexNormals();
           onloadFunction(model);
