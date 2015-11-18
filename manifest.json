@@ -8,7 +8,6 @@
     "system.display",
     "pointerLock"
   ],
-  "minimum_chrome_version": "41",
   "requirements": {
     "3D": {
       "features": ["webgl"]

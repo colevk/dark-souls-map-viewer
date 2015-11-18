@@ -25,28 +25,49 @@ function init() {
     camera.updateProjectionMatrix();
   })
 
-  controls = new Controls(camera, renderer.domElement);
-
   var element = canvas.get()[0];
 
-  // Enable controls only when pointer is locked.
-  var pointerlockchange = function() {
-    controls.enabled = (document.pointerLockElement === element)
+  var havePointerLock =
+    'pointerLockElement' in document ||
+    'mozPointerLockElement' in document ||
+    'webkitPointerLockElement' in document;
+
+  if (havePointerLock) {
+    controls = new PointerLockControls(camera, renderer.domElement);
+
+    // Enable controls only when pointer is locked.
+    var pointerlockchange = function() { controls.enabled = (document.pointerLockElement === element) }
+    var mozpointerlockchange = function() { controls.enabled = (document.mozPointerLockElement === element) }
+    var webkitpointerlockchange = function() { controls.enabled = (document.webkitPointerLockElement === element) }
+
+    // Hook pointer lock state change events
+    document.addEventListener('pointerlockchange', pointerlockchange, false);
+    document.addEventListener('mozpointerlockchange', mozpointerlockchange, false);
+    document.addEventListener('webkitpointerlockchange', webkitpointerlockchange, false);
+
+    element.requestPointerLock =
+      element.requestPointerLock ||
+      element.mozRequestPointerLock ||
+      element.webkitRequestPointerLock;
+
+    canvas.click(function() {
+      element.requestPointerLock();
+    });
+
+    document.exitPointerLock =
+      document.exitPointerLock ||
+      document.mozExitPointerLock ||
+      document.webkitExitPointerLock;
+
+    // Pointer lock exit must be manual in Chrome Apps
+    $(document).keyup(function(e) {
+      if (e.which == 27) {
+        document.exitPointerLock();
+      }
+    });
+  } else {
+    controls = new NoPointerLockControls(camera, renderer.domElement);
   }
-
-  // Hook pointer lock state change events
-  document.addEventListener('pointerlockchange', pointerlockchange, false);
-
-  canvas.click(function() {
-    element.requestPointerLock();
-  });
-
-  // Pointer lock exit must be manual in Chrome Apps
-  $(document).keyup(function(e) {
-    if (e.which == 27) {
-      document.exitPointerLock();
-    }
-  })
 
   camera.position.copy(Config.defaultCameraPosition());
   camera.lookAt(Config.defaultCameraLookAt());
