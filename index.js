@@ -79,6 +79,7 @@ function init() {
     });
   } else {
     controls = new NoPointerLockControls(camera, renderer.domElement);
+    document.getElementById('pl-controls').style.display = 'none';
   }
 
   camera.position.copy(Config.defaultCameraPosition());

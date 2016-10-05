@@ -68,15 +68,9 @@ SceneLoader = new function() {
           // Explode vertices, as we want non-shared attributes for normals
           // and for vertex numbering.
           for (var j = start; j < end; j++) {
-            positions[9 * (j - start) + 0] = verts[3 * tris[3 * j + 0] + 0];
-            positions[9 * (j - start) + 1] = verts[3 * tris[3 * j + 0] + 1];
-            positions[9 * (j - start) + 2] = verts[3 * tris[3 * j + 0] + 2];
-            positions[9 * (j - start) + 3] = verts[3 * tris[3 * j + 1] + 0];
-            positions[9 * (j - start) + 4] = verts[3 * tris[3 * j + 1] + 1];
-            positions[9 * (j - start) + 5] = verts[3 * tris[3 * j + 1] + 2];
-            positions[9 * (j - start) + 6] = verts[3 * tris[3 * j + 2] + 0];
-            positions[9 * (j - start) + 7] = verts[3 * tris[3 * j + 2] + 1];
-            positions[9 * (j - start) + 8] = verts[3 * tris[3 * j + 2] + 2];
+            for (var k = 0; k < 9; k++) {
+              positions[9 * (j - start) + k] = verts[3 * tris[3 * j + Math.floor(k / 3)] + k % 3]
+            }
           }
 
           model.addAttribute('position', new THREE.BufferAttribute(positions, 3));
